@@ -1,0 +1,22 @@
+version: '3.8'
+
+services: 
+  db:
+    container_name: mysql
+    build: ./mysql
+    command: --default-authentication-plugin=mysql_native_password 
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+
+  myphp:
+    container_name: myphp
+    build: ./myphp
+    restart: always
+    volumes: 
+      - ./myphp/html:/var/www/html
+    ports:
+      - 42069:80
+    depends_on: 
+      - db
+  

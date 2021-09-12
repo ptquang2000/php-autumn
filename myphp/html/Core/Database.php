@@ -89,7 +89,7 @@ class Query
     # Prepare statement
     $stmt = $this->conn->prepare($query);
     $type = array_map(function($e){
-      return gettype($e)[0];
+      return $e ? gettype($e)[0] : 'b';
     }, $fields);
     $stmt->bind_param(implode('', $type), ...array_values($fields));
     $stmt->execute();
@@ -124,15 +124,12 @@ class Database
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     $this->conn = new mysqli($url, $usr, $pass, $db);
     if ($this->conn->connect_errno)
-    {
       throw new RuntimeException('mysqli connection error: ' . $this->conn->connect_error);
-    } 
   }
 
-  public function table($tbl=null)
-  {
-    return new Query($tbl, $this->conn);
-  }
+  public function table($tbl=null) { return new Query($tbl, $this->conn); }
+
+  public function get_conn() { return $this->conn;}
 
   private $conn;
 }

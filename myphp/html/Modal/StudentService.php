@@ -1,12 +1,10 @@
 <?php
 
-use Core\Attributes\Service;
-use Core\Service\ModalService;
+use Core\Service\Service;
 
-#[Service]
 class StudentService
 {
-  use ModalService;
+  use Service;
 
   private StudentRepository $repository;
 

@@ -3,7 +3,7 @@
 use Core\Attributes\Entity;
 use Core\Repository\IRepository;
 
-#[Entity(entity:'Student')]
+#[Entity(class:'Student')]
 interface StudentRepository extends IRepository
 {
 }

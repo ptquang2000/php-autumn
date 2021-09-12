@@ -1,35 +1,37 @@
 <?php
-
-include 'Core\Attributes.php';
-include 'Core\Service.php';
-include 'Core\Repository.php';
-include 'Core\Database.php';
-
+require 'Core/Attributes.php';
+require 'Core/Repository.php';
+require 'Core/Database.php';
+require 'Core/Service.php';
 spl_autoload_register(function($class)
 {
-  include 'Modal\\'.$class.'.php';
+  include 'Modal/'.$class.'.php';
 });
-
-$service = new StudentService();
-// echo '</h3><h1>UPDATE ENTITY</h1><h3>';
-// var_dump($obj=$service->save_student(
-//   Student::StudentInludeRela('Giorno Giorvarna', 1, 'Ecomerce', Course::CourseSufficent(1, 'Calculus 101'))));
-// var_dump($service->save_student(
-//   Student::StudentInludeRela('Johnathan Joestart', 1, 'Ecomerce', Course::CourseOnlyId(1))));
-// echo '</h3>';
-// echo '<h1>SELECT BY ID</h1><h3>';
-// var_dump($service->get_student_by_id(Student::StudentById($obj->get_id())));
-// echo '<h1>DELETE BY ID</h1><h3>';
-// var_dump($service->delete_student(Student::StudentById($obj->get_id())));
-// echo '</h3><h1>SELECT ALL</h1><h3>';
-// var_dump($service->get_all_students());
-
-$course_service = new CourseService();
-echo '</h3><h1>SELECT BY ID</h1><h3>';
-$obj = $course_service->get_course(Course::CourseOnlyId(1));
-var_dump($obj);
-echo '</h3><h1>SELECT ALL</h1><h3>';
-$obj = $course_service->get_all_courses();
-var_dump($obj);
+echo '<h1>SELECT BY ID</h1>';
+$student_s = new StudentService();
+$major_s = new MajorService();
+echo '</h3><h3>';
+echo '<h1>SELECT ALL MAJOR</h1>';
+$objs = $major_s->get_all_major();
+foreach($objs as $obj)
+{
+  echo '</h3><h3>';
+  var_dump($obj);
+  echo '</h3>';
+}
+echo '<h1>SELECT ALL STUDENT</h1>';
+$objs = $student_s->get_all_students();
+foreach($objs as $obj)
+{
+  echo '</h3><h3>';
+  var_dump($obj);
+  echo '</h3>';
+}
+echo '<h1>SELECT DELETE MAJOR</h1>';
+echo '<h3>';
+$objs = $major_s->save_major(Major::Major(3, 'Economics'));
+$student_s->save_student(Student::StudentWithNameMajor('Sasha', Major::MajorWithId(3)));
+$student_s->save_student(Student::StudentWithNameMajor('Edie', Major::MajorWithId(3)));
+$objs = $major_s->delete_major(Major::MajorWithId(3));
 echo '</h3>';
 ?>

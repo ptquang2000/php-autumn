@@ -17,7 +17,7 @@ interface IRepository
   public function count($where = NULL);
 }
 
-trait Repository 
+class Repository 
 {
   private $db;
   private $entity_name;
@@ -26,8 +26,7 @@ trait Repository
   public function __construct()
   {
     $interface = (new ReflectionClass($this))->getInterfaceNames()[0];
-    $ref = (new ReflectionClass($interface))->getAttributes()[0]->getArguments();
-    $this->entity_name = $ref['entity'];
+    $this->entity_name = (new ReflectionClass($interface))->getAttributes()[0]->getArguments()['class'];
 
     $config = parse_ini_file('config.ini');
 
@@ -89,13 +88,73 @@ trait Repository
 
     $id_col = array();
 
+    $m_classes = array();
+
     foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
     {
-      $ref = $property->getAttributes()[0];
-      if ($ref->getName() == 'Core\Attributes\ID')
-        $id_col[$ref->getArguments()['name']] = $entity->{'get_'.$property->name}();
+      $attribute = $property->getAttributes()[0];
+      if ($attribute->getName() == 'Core\Attributes\ID')
+        $id_col[$attribute->getArguments()['name']] = $entity->{'get_'.$property->name}();
+      else if ($attribute->getName() == 'Core\Attributes\OneToMany')
+      {
+        if (isset($attribute->getArguments()['cascade']))
+          $m_classes[] = array_merge($attribute->getArguments(), ['property' => $property->getName()]);
+      }
     }
-    $this->db->table($this->entity_name)->delete($id_col);
+    if ($m_classes)
+    {
+      $this->db->get_conn()->begin_transaction(); 
+      try{
+        foreach($m_classes as $m_class)
+        {
+          foreach (($reflection=new ReflectionClass($m_class['map_by']))->getProperties() as $property) {
+            if ($property->getAttributes()[0]->getName() == 'Core\Attributes\ID'
+            && $m_class['cascade'] == 1)
+            {
+              foreach ($this->instantiate($this->db->table($this->entity_name)
+              ->select_by_id($id_col))->{'get_'.$m_class['property']}() as $m_obj)
+              
+                  $this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
+                    ->delete([$property->getAttributes()[0]->getArguments()['name']
+                      =>$m_obj->{'get_'.$property->getName()}()]);
+              break;
+            }
+            else if ($property->getAttributes()[0]->getName() == 'Core\Attributes\ManyToOne'
+            && $m_class['cascade'] == 0
+            && $property->getType()->getName() == $this->entity_name)
+            {
+              foreach ($this->instantiate($this->db->table($this->entity_name)
+              ->select_by_id($id_col))->{'get_'.$m_class['property']}() as $m_obj)
+              {
+                foreach ($reflection->getProperties() as $prop) {
+                  if ($prop->getAttributes()[0]->getName() == 'Core\Attributes\ID')
+                  {
+                    var_dump($this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
+                      ->update([
+                        $property->getAttributes()[0]->getArguments()['name']
+                          =>null, #fk
+                        $prop->getAttributes()[0]->getArguments()['name']
+                          =>$m_obj->{'get_'.$prop->getName()}() #id
+                      ]));
+                    break;
+                  }
+                }
+              }
+              break;
+            }
+          }
+        }
+        $this->db->table($this->entity_name)->delete($id_col);
+        $this->db->get_conn()->commit();
+      }
+      catch (mysqli_sql_exception $exception)
+      {
+        $this->db->get_conn()->rollback(); 
+        throw $exception;
+      }
+    }
+    else
+      $this->db->table($this->entity_name)->delete($id_col);
   }
 
   public function find_all()
@@ -114,9 +173,9 @@ trait Repository
 
     foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
     {
-      $ref = $property->getAttributes()[0];
-      if ($ref->getName() == 'Core\Attributes\ID')
-        $id_col[$ref->getArguments()['name']] = $entity->{'get_'.$property->name}();
+      $attribute = $property->getAttributes()[0];
+      if ($attribute->getName() == 'Core\Attributes\ID')
+        $id_col[$attribute->getArguments()['name']] = $entity->{'get_'.$property->name}();
     }
 
     return $this->instantiate($this->db->table($this->entity_name)->select_by_id($id_col));
@@ -129,53 +188,48 @@ trait Repository
   private function instantiate($obj)
   {
     $entity = new $this->entity_name();
+
     foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
     {
-      $ref = $property->getAttributes()[0];
-      if ($ref->getName() == 'Core\Attributes\ID' || $ref->getName() == 'Core\Attributes\Column')
+      $attribute = $property->getAttributes()[0];
+      if ($attribute->getName() == 'Core\Attributes\ID' || $attribute->getName() == 'Core\Attributes\Column')
       {
-        $value = $obj->{$ref->getArguments()['name']};
-        settype($value, $property->getType());
+        $value = $obj->{$attribute->getArguments()['name']};
+        // settype($value, $property->getType());
         $entity->{'set_'.$property->name}($value);
       }
-      else if ($ref->getName() == 'Core\Attributes\ManyToOne')
+      else if ($attribute->getName() == 'Core\Attributes\ManyToOne')
       {
-        $r_class = $property->getType()->getName();
-
-        $r_id = $obj->{$ref->getArguments()['name']};
-
-        if ($r_id)
+        $fk_class = $property->getType()->getName();
+        if ($fk_id=$obj->{$attribute->getArguments()['name']})
         {
-          $r_col = $ref->getArguments()['ref_col_name'];
-          $r_table = (new ReflectionClass($r_class))
-            ->getAttributes()[0]->getArguments()[0];
-
-          $r_obj = $this->db->table($r_table)->select_by_id([$r_col => $r_id]);
-          $entity->{'set_'.$property->name}($this->instantiate_related($r_class, $r_obj));
+          $ref_col_name = $attribute->getArguments()['ref_col_name'];
+          $ref_table_name = (new ReflectionClass($fk_class))->getAttributes()[0]->getArguments()['name'];
+          $entity->{'set_'.$property->name}(
+            $this->instantiate_related(
+              $fk_class, 
+              $this->db->table($ref_table_name)
+                ->select_by_id([$ref_col_name => $fk_id])
+          ));
         }
       }
-      else if ($ref->getName() == 'Core\Attributes\OneToMany')
+      else if ($attribute->getName() == 'Core\Attributes\OneToMany')
       {
-        $m_entity = $ref->getArguments()['map_by'];
-        $m_ref = new ReflectionClass($m_entity);
-        $m_table = $m_ref->getAttributes()[0]->getArguments()[0];
+        $m_class = $attribute->getArguments()['map_by'];
+        $reflection = new ReflectionClass($m_class);
         $m_objs = array();
-        foreach($m_ref->getProperties() as $m_property)
-        {
+        foreach($reflection->getProperties() as $m_property)
           if ($m_property->getAttributes()[0]->getName() == 'Core\Attributes\ManyToOne')
           {
             $r_col = $m_property->getAttributes()[0]->getArguments()['name'];
             $r_col_name = $m_property->getAttributes()[0]->getArguments()['ref_col_name'];
-            foreach($this->db->table($m_table)
-              ->select_by_fields([$r_col => $obj->$r_col_name]) as $m_obj)
-            {
-              $m = $this->instantiate_related($m_entity, $m_obj);
-              $m->{'set_'.$m_property->getName()}($entity);
-              $m_objs[] = $m;
-            }
+            foreach(
+            $this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
+              ->select_by_fields([$r_col => $obj->$r_col_name])
+            as $m_obj)
+              $m_objs[] = $this->instantiate_related($m_class, $m_obj);
             $entity->{'set_'.$property->getName()}($m_objs);
           }
-        }
       }
     }
     return $entity;
@@ -189,7 +243,7 @@ trait Repository
       if ($ref->getName() == 'Core\Attributes\ID' || $ref->getName() == 'Core\Attributes\Column')
       {
         $value = $obj->{$ref->getArguments()['name']};
-        settype($value, $property->getType());
+        // settype($value, $property->getType());
         $entity->{'set_'.$property->name}($value);
       }
     }

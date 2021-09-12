@@ -3,8 +3,8 @@
 use Core\Attributes\Entity;
 use Core\Repository\IRepository;
 
-#[Entity(entity:'Course')]
-interface CourseRepository extends IRepository
+#[Entity(class:'Major')]
+interface MajorRepository extends IRepository
 {
 }
 

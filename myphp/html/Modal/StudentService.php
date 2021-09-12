@@ -24,6 +24,10 @@ class StudentService
   {
     return $this->repository->delete($student);
   }
+  public function count_students($fields)
+  {
+    return $this->repository->count($fields);
+  }
 }
 
 ?>

@@ -41,6 +41,26 @@ class Query
     return $objs;
   }
 
+  public function count_by_fields($fields = [])
+  {
+    $query = 'SELECT COUNT(*) FROM ' . $this->table;
+    if (!$fields) return (int)$this->conn->query($query)->fetch_array()[0];
+    if (gettype($fields) == 'string') 
+      return (int)$this->conn->query($query.' GROUP BY '.$fields)->fetch_array()[0];
+    $query .= ' GROUP BY ' . implode(', ',array_keys($fields));
+    echo $query;
+
+    # Prepare statement
+    $stmt = $this->conn->prepare($query);
+    $type = array_map(function($e){
+      return gettype($e)[0];
+    }, $fields);
+    $stmt->bind_param(implode('', $type), ...array_values($fields));
+    $stmt->execute();
+
+    return $stmt->get_result()->fecth_array()[0];
+  }
+
   public function select_by_id($id = [])
   {
     # Sql query
@@ -128,6 +148,14 @@ class Database
   }
 
   public function table($tbl=null) { return new Query($tbl, $this->conn); }
+
+  public function sql_query($stmt) {
+    $this->db->get_conn()->query($sql);
+    $result = $stmt->get_result();
+    while ($obj = $result->fetch_object())
+      $objs[] = $obj;
+    return $objs;
+  }
 
   public function get_conn() { return $this->conn;}
 

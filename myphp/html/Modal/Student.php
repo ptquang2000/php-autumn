@@ -22,6 +22,14 @@ class Student {
     $obj->set_major($major);
     return $obj;
   }
+  public static function Student($id, $name, $major)
+  {
+    $obj = new Student();
+    $obj->set_id($id);
+    $obj->set_name($name);
+    $obj->set_major($major);
+    return $obj;
+  }
 
   public function get_id() {return $this->id;}
   public function set_id($id) {$this->id = $id;}

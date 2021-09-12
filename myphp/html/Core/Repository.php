@@ -11,10 +11,9 @@ interface IRepository
   public function delete($entity);
   public function find_all();
   public function find_by_id($entity);
-  public function find_by_prop($prop, $value);
-  public function find_all_by_prop($prop, $value);
+  public function find_by_props($entity);
   public function find_by_sql($sql="");
-  public function count($where = NULL);
+  public function count($entity);
 }
 
 class Repository 
@@ -180,10 +179,48 @@ class Repository
 
     return $this->instantiate($this->db->table($this->entity_name)->select_by_id($id_col));
   }
-  public function find_by_prop($prop, $value) {}
-  public function find_all_by_prop($prop, $value) {}
-  public function find_by_sql($sql="") {}
-  public function count($where = NULL) {}
+  public function find_by_props($entity) {
+    if (get_class($entity) != $this->entity_name) return null;
+
+    $fields = array();
+
+    foreach ((new ReflectionClass($entity))->getProperties() as $property)
+    {
+      $ref = $property->getAttributes()[0];
+      try
+      {
+        if ($ref->getName() == 'Core\Attributes\ID'
+        && $ref->getName() == 'Core\Attributes\Column'
+        )
+          $fields[$ref->getArguments()['name']] = $entity->{'get_'.$property->name}();
+
+        else if ($ref->getName() == 'Core\Attributes\ManyToOne')
+          # Get relative info;
+          foreach((new ReflectionClass($property->getType()->getName()))->getProperties() as $r_property)
+            if ($r_property->getAttributes()[0]->getName() == 'Core\Attributes\ID')
+              $fields[$ref->getArguments()['name']] = $entity->{'get_'.$property->getName()}()
+                ->{'get_'.$r_property->getName()}();
+      }
+      catch (Error $error){}
+    }
+
+    $objs = array();
+    foreach($this->db->table($this->entity_name)->select_by_fields($fields) as $obj)
+      $objs[] = $this->instantiate($obj);
+    return $objs;
+
+  }
+
+  public function find_by_sql($sql="")
+  {
+    if (!$sql) return null;
+    return $this->db->sql_query($sql);
+  }
+
+  public function count($fields = [])
+  {
+    return $this->db->table($this->entity_name)->count_by_fields($fields);
+  }
 
   private function instantiate($obj)
   {

@@ -1,9 +1,11 @@
 <?php
 
-use Core\Attributes\Column;
-use Core\Attributes\ID;
-use Core\Attributes\Table;
-use Core\Attributes\OneToMany;
+namespace App;
+
+use Core\Column;
+use Core\ID;
+use Core\Table;
+use Core\OneToMany;
 
 #[Table(name:'major')]
 class Major {

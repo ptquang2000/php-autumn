@@ -1,12 +1,16 @@
 <?php
-require 'Core/Attributes.php';
-require 'Core/Repository.php';
-require 'Core/Database.php';
-require 'Core/Service.php';
+
+use App\StudentService;
+use App\MajorService;
+
 spl_autoload_register(function($class)
 {
-  include 'Modal/'.$class.'.php';
+  $parts = explode('\\', $class);
+  $file = array_pop($parts);
+  $path = __DIR__. '\\'.implode('\\',$parts) . '\\' .$file.'.php';
+  include_once $path;
 });
+
 $student_s = new StudentService();
 $major_s = new MajorService();
 echo '<h1>select name</h1>';

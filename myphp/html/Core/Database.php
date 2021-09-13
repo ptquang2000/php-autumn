@@ -1,5 +1,8 @@
 <?php
 
+namespace Core;
+use mysqli;
+
 class Query
 {
   public function __construct($table, &$conn)

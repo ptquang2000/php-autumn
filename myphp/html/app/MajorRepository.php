@@ -1,7 +1,8 @@
 <?php
+namespace App;
 
-use Core\Attributes\Entity;
-use Core\Repository\IRepository;
+use Core\Entity;
+use Core\IRepository;
 
 #[Entity(class:'Major')]
 interface MajorRepository extends IRepository

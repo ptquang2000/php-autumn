@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Attributes;
+namespace Core;
 
 use Attribute;
 

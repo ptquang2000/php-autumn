@@ -1,6 +1,8 @@
 <?php
 
-use Core\Service\Service;
+namespace App;
+
+use Core\Service;
 
 class StudentService
 {

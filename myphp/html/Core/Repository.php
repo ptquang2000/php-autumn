@@ -1,24 +1,9 @@
 <?php
-namespace Core\Repository;
+namespace Core;
 
-use Database;
+use Core\Database;
 use Error;
 use ReflectionClass;
-
-interface IRepository 
-{
-  public function save($entity);
-  public function delete($entity);
-  public function find_all();
-  public function find_by_id($entity);
-  public function find_by_props($prop, $cond=null);
-  public function find_by_sql($sql="");
-  public function count($entity);
-
-  # find_by_$col1()
-  # find_by_$col1_and_$col2()
-  # find_by_$col1_or_$col2()
-}
 
 class Repository 
 {
@@ -30,8 +15,10 @@ class Repository
   public function __construct()
   {
     $interface = (new ReflectionClass($this))->getInterfaceNames()[0];
-    $class = (new ReflectionClass($interface))->getAttributes()[0]->getArguments()['class'];
+
+    $class = 'App\\'.(new ReflectionClass($interface))->getAttributes()[0]->getArguments()['class'];
     $this->entity_name = $class;
+
     $this->entity_table = (new ReflectionClass($class))->getAttributes()[0]->getArguments()['name'];
 
     $config = parse_ini_file('config.ini');
@@ -55,22 +42,22 @@ class Repository
       $ref = $property->getAttributes()[0];
       try
       {
-        if ($ref->getName() == 'Core\Attributes\ID')
+        if ($ref->getName() == 'Core\ID')
           $id_col[$ref->getArguments()['name']] = $entity->{'get_'.$property->name}();
 
-        else if ($ref->getName() == 'Core\Attributes\Column')
+        else if ($ref->getName() == 'Core\Column')
           $fields[$ref->getArguments()['name']] = $entity->{'get_'.$property->name}();
 
-        else if ($ref->getName() == 'Core\Attributes\ManyToOne')
+        else if ($ref->getName() == 'Core\ManyToOne')
           # Get relative info;
           foreach((new ReflectionClass($property->getType()->getName()))->getProperties() as $r_property)
-            if ($r_property->getAttributes()[0]->getName() == 'Core\Attributes\ID')
+            if ($r_property->getAttributes()[0]->getName() == 'Core\ID')
               $fields[$ref->getArguments()['name']] = $entity->{'get_'.$property->getName()}()
                 ->{'get_'.$r_property->getName()}();
       }
       catch (Error $error)
       {
-        if ($ref->getName() == 'Core\Attributes\ID')
+        if ($ref->getName() == 'Core\ID')
           $id_col[$ref->getArguments()['name']] = 0;
       }
     }
@@ -99,9 +86,9 @@ class Repository
     foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
     {
       $attribute = $property->getAttributes()[0];
-      if ($attribute->getName() == 'Core\Attributes\ID')
+      if ($attribute->getName() == 'Core\ID')
         $id_col[$attribute->getArguments()['name']] = $entity->{'get_'.$property->name}();
-      else if ($attribute->getName() == 'Core\Attributes\OneToMany')
+      else if ($attribute->getName() == 'Core\OneToMany')
       {
         if (isset($attribute->getArguments()['cascade']))
           $m_classes[] = array_merge($attribute->getArguments(), ['property' => $property->getName()]);
@@ -114,7 +101,7 @@ class Repository
         foreach($m_classes as $m_class)
         {
           foreach (($reflection=new ReflectionClass($m_class['map_by']))->getProperties() as $property) {
-            if ($property->getAttributes()[0]->getName() == 'Core\Attributes\ID'
+            if ($property->getAttributes()[0]->getName() == 'Core\ID'
             && $m_class['cascade'] == 1)
             {
               foreach ($this->instantiate($this->db->table($this->entity_table)
@@ -125,7 +112,7 @@ class Repository
                       =>$m_obj->{'get_'.$property->getName()}()]);
               break;
             }
-            else if ($property->getAttributes()[0]->getName() == 'Core\Attributes\ManyToOne'
+            else if ($property->getAttributes()[0]->getName() == 'Core\ManyToOne'
             && $m_class['cascade'] == 0
             && $property->getType()->getName() == $this->entity_name)
             {
@@ -133,7 +120,7 @@ class Repository
               ->select_by_id($id_col))->{'get_'.$m_class['property']}() as $m_obj)
               {
                 foreach ($reflection->getProperties() as $prop) {
-                  if ($prop->getAttributes()[0]->getName() == 'Core\Attributes\ID')
+                  if ($prop->getAttributes()[0]->getName() == 'Core\ID')
                   {
                     var_dump($this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
                       ->update([
@@ -178,7 +165,7 @@ class Repository
     foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
     {
       $attribute = $property->getAttributes()[0];
-      if ($attribute->getName() == 'Core\Attributes\ID')
+      if ($attribute->getName() == 'Core\ID')
       {
         $id_col[$attribute->getArguments()['name']] = $id;
         break;
@@ -215,13 +202,13 @@ class Repository
     foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
     {
       $attribute = $property->getAttributes()[0];
-      if ($attribute->getName() == 'Core\Attributes\ID' || $attribute->getName() == 'Core\Attributes\Column')
+      if ($attribute->getName() == 'Core\ID' || $attribute->getName() == 'Core\Column')
       {
         $value = $obj->{$attribute->getArguments()['name']};
         // settype($value, $property->getType());
         $entity->{'set_'.$property->name}($value);
       }
-      else if ($attribute->getName() == 'Core\Attributes\ManyToOne')
+      else if ($attribute->getName() == 'Core\ManyToOne')
       {
         $fk_class = $property->getType()->getName();
         if ($fk_id=$obj->{$attribute->getArguments()['name']})
@@ -236,13 +223,13 @@ class Repository
           ));
         }
       }
-      else if ($attribute->getName() == 'Core\Attributes\OneToMany')
+      else if ($attribute->getName() == 'Core\OneToMany')
       {
         $m_class = $attribute->getArguments()['map_by'];
         $reflection = new ReflectionClass($m_class);
         $m_objs = array();
         foreach($reflection->getProperties() as $m_property)
-          if ($m_property->getAttributes()[0]->getName() == 'Core\Attributes\ManyToOne')
+          if ($m_property->getAttributes()[0]->getName() == 'Core\ManyToOne')
           {
             $r_col = $m_property->getAttributes()[0]->getArguments()['name'];
             $r_col_name = $m_property->getAttributes()[0]->getArguments()['ref_col_name'];
@@ -263,7 +250,7 @@ class Repository
     foreach((new ReflectionClass($class))->getProperties() as $property)
     {
       $ref = $property->getAttributes()[0];
-      if ($ref->getName() == 'Core\Attributes\ID' || $ref->getName() == 'Core\Attributes\Column')
+      if ($ref->getName() == 'Core\ID' || $ref->getName() == 'Core\Column')
       {
         $value = $obj->{$ref->getArguments()['name']};
         // settype($value, $property->getType());

@@ -1,9 +1,11 @@
 <?php
 
-use Core\Attributes\Column;
-use Core\Attributes\ID;
-use Core\Attributes\ManyToOne;
-use Core\Attributes\Table;
+namespace App;
+
+use Core\Column;
+use Core\ID;
+use Core\ManyToOne;
+use Core\Table;
 
 #[Table(name:'student')]
 class Student {

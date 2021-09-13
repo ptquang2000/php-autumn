@@ -1,7 +1,9 @@
 <?php
 
-use Core\Attributes\Entity;
-use Core\Repository\IRepository;
+namespace App;
+
+use Core\Entity;
+use Core\IRepository;
 
 #[Entity(class:'Student')]
 interface StudentRepository extends IRepository

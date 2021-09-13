@@ -1,5 +1,5 @@
 <?php
-namespace Core\Service;
+namespace Core;
 
 use ReflectionClass;
 use ErrorException;
@@ -10,7 +10,15 @@ function validateMethod($method)
 
 define ('FIND_BY', [
   'and'=> ['and', '='],
-  'or' => ['or', '=']
+  'is'=> ['and', '='],
+  'equal'=> ['and', '='],
+  'or' => ['or', '='],
+  'lessthan' => ['or', '<'],
+  'lessthanequal' => ['or', '<='],
+  'greaterthan' => ['or', '>'],
+  'greaterthanequal' => ['or', '>='],
+  'like' => ['or', 'like'],
+  'notlike' => ['or', 'not like'],
 ]);
 
 trait Service 
@@ -29,8 +37,9 @@ trait Service
       $interface = $refRepo->getType()->getName();
       $refRepo->setAccessible(true);
 
+      var_dump($interface);
       # Process unimplement method
-      $userMethod = array_diff(get_class_methods($interface), get_class_methods('Core\Repository\IRepository'));
+      $userMethod = array_diff(get_class_methods($interface), get_class_methods('Core\IRepository'));
 
       $unimp_methods = array();
 
@@ -71,7 +80,7 @@ trait Service
       # Get Mapping Enity
       // $entity = (new ReflectionClass($interface))->getAttributes()[0]->getArguments()['name'];
       $code =<<<EOF
-      use Core\Repository\Repository;
+      use Core\Repository;
       \$refRepo->setValue(\$this, new class extends Repository implements $interface {
         $unimp_methods
       });

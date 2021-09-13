@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\PHP;
 
 use Core\Column;
 use Core\ID;

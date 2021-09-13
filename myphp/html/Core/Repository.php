@@ -16,7 +16,7 @@ class Repository
   {
     $interface = (new ReflectionClass($this))->getInterfaceNames()[0];
 
-    $class = 'App\\'.(new ReflectionClass($interface))->getAttributes()[0]->getArguments()['class'];
+    $class = 'App\\PHP\\'.(new ReflectionClass($interface))->getAttributes()[0]->getArguments()['class'];
     $this->entity_name = $class;
 
     $this->entity_table = (new ReflectionClass($class))->getAttributes()[0]->getArguments()['name'];

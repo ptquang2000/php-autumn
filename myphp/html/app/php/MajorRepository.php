@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace App\PHP;
 
 use Core\Entity;
 use Core\IRepository;

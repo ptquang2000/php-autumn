@@ -2,10 +2,7 @@
 
 namespace App\PHP;
 
-use Core\Column;
-use Core\ID;
-use Core\Table;
-use Core\OneToMany;
+use Core\{Column, ID, Table, OneToMany};
 
 #[Table(name:'major')]
 class Major {

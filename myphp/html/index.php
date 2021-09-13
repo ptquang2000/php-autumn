@@ -1,17 +1,26 @@
 <?php
 
-use App\PHP\StudentService;
-use App\PHP\MajorService;
+
+define("DL", "\\");
 
 spl_autoload_register(function($class)
 {
   $parts = explode('\\', $class);
   $file = array_pop($parts);
-  $path = __DIR__. '\\'.implode('\\',$parts) . '\\' .$file.'.php';
-  include_once $path;
+  $path = __DIR__.DL.implode(DL,$parts).DL.$file.'.php';
+  if (file_exists($path))
+    include_once $path; 
 });
 
+// Routing
+$url = $_SERVER['REQUEST_URI'];
+// $url = preg_replace('/(^\/)/', '', $url);
+$url = preg_replace('/(\\/?\?.+)/', '', $url);
 
+use Core\Router;
+Router::route($url);
+
+// use App\PHP\{StudentService, MajorService};
 
 // $student_s = new StudentService();
 // $major_s = new MajorService();

@@ -2,8 +2,7 @@
 
 namespace App\PHP;
 
-use Core\Entity;
-use Core\IRepository;
+use Core\{Entity, IRepository};
 
 #[Entity(class:'Student')]
 interface StudentRepository extends IRepository

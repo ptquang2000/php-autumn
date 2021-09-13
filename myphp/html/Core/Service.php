@@ -4,10 +4,6 @@ namespace Core;
 use ReflectionClass;
 use ErrorException;
 
-function validateMethod($method)
-{
-}
-
 define ('FIND_BY', [
   'and'=> ['and', '='],
   'is'=> ['and', '='],
@@ -77,15 +73,13 @@ trait Service
         else throw new ErrorException("Invalid defined function in interface $interface");
       }
       $unimp_methods = implode(' ',$unimp_methods);
-      # Get Mapping Enity
-      // $entity = (new ReflectionClass($interface))->getAttributes()[0]->getArguments()['name'];
+
       $code =<<<EOF
       use Core\Repository;
       \$refRepo->setValue(\$this, new class extends Repository implements $interface {
         $unimp_methods
       });
       EOF;
-      // echo $code;
       eval($code);
 
     } 

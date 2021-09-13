@@ -2,10 +2,7 @@
 
 namespace App\PHP;
 
-use Core\Column;
-use Core\ID;
-use Core\ManyToOne;
-use Core\Table;
+use Core\{Column, ID, ManyToOne, Table};
 
 #[Table(name:'student')]
 class Student {

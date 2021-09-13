@@ -11,21 +11,28 @@ interface IRepository
   public function delete($entity);
   public function find_all();
   public function find_by_id($entity);
-  public function find_by_props($entity);
+  public function find_by_props($prop, $cond=null);
   public function find_by_sql($sql="");
   public function count($entity);
+
+  # find_by_$col1()
+  # find_by_$col1_and_$col2()
+  # find_by_$col1_or_$col2()
 }
 
 class Repository 
 {
   private $db;
   private $entity_name;
+  private $entity_table;
   public $parent = NULL;
 
   public function __construct()
   {
     $interface = (new ReflectionClass($this))->getInterfaceNames()[0];
-    $this->entity_name = (new ReflectionClass($interface))->getAttributes()[0]->getArguments()['class'];
+    $class = (new ReflectionClass($interface))->getAttributes()[0]->getArguments()['class'];
+    $this->entity_name = $class;
+    $this->entity_table = (new ReflectionClass($class))->getAttributes()[0]->getArguments()['name'];
 
     $config = parse_ini_file('config.ini');
 
@@ -68,17 +75,17 @@ class Repository
       }
     }
     if ($id_col[array_key_first($id_col)] != 0)
-      $this->db->table($this->entity_name)->update(array_merge($fields, $id_col));
+      $this->db->table($this->entity_table)->update(array_merge($fields, $id_col));
     else 
-      $id_col[array_key_first($id_col)] = $this->db->table($this->entity_name)->insert($fields);
+      $id_col[array_key_first($id_col)] = $this->db->table($this->entity_table)->insert($fields);
 
-    $obj = $this->db->table($this->entity_name)->select_by_id($id_col);
+    $obj = $this->db->table($this->entity_table)->select_by_id($id_col);
 
     # insert enity including id fields if an entity had the id which didn't exist in db
     if (!$obj) 
-      $id_col[array_key_first($id_col)] = $this->db->table($this->entity_name)->insert(array_merge($fields, $id_col));
+      $id_col[array_key_first($id_col)] = $this->db->table($this->entity_table)->insert(array_merge($fields, $id_col));
 
-    return $this->instantiate($this->db->table($this->entity_name)->select_by_id($id_col));
+    return $this->instantiate($this->db->table($this->entity_table)->select_by_id($id_col));
   }
 
   public function delete($entity)
@@ -110,7 +117,7 @@ class Repository
             if ($property->getAttributes()[0]->getName() == 'Core\Attributes\ID'
             && $m_class['cascade'] == 1)
             {
-              foreach ($this->instantiate($this->db->table($this->entity_name)
+              foreach ($this->instantiate($this->db->table($this->entity_table)
               ->select_by_id($id_col))->{'get_'.$m_class['property']}() as $m_obj)
               
                   $this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
@@ -122,7 +129,7 @@ class Repository
             && $m_class['cascade'] == 0
             && $property->getType()->getName() == $this->entity_name)
             {
-              foreach ($this->instantiate($this->db->table($this->entity_name)
+              foreach ($this->instantiate($this->db->table($this->entity_table)
               ->select_by_id($id_col))->{'get_'.$m_class['property']}() as $m_obj)
               {
                 foreach ($reflection->getProperties() as $prop) {
@@ -143,7 +150,7 @@ class Repository
             }
           }
         }
-        $this->db->table($this->entity_name)->delete($id_col);
+        $this->db->table($this->entity_table)->delete($id_col);
         $this->db->get_conn()->commit();
       }
       catch (mysqli_sql_exception $exception)
@@ -153,59 +160,38 @@ class Repository
       }
     }
     else
-      $this->db->table($this->entity_name)->delete($id_col);
+      $this->db->table($this->entity_table)->delete($id_col);
   }
 
   public function find_all()
   {
     $objs = array();
-    foreach($this->db->table($this->entity_name)->select_all() as $obj)
+    foreach($this->db->table($this->entity_table)->select_all() as $obj)
       $objs[] = $this->instantiate($obj);
     return $objs;
   }
 
-  public function find_by_id($entity)
+  public function find_by_id($id)
   {
-    if (get_class($entity) != $this->entity_name) return null;
-
     $id_col = array();
 
     foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
     {
       $attribute = $property->getAttributes()[0];
       if ($attribute->getName() == 'Core\Attributes\ID')
-        $id_col[$attribute->getArguments()['name']] = $entity->{'get_'.$property->name}();
-    }
-
-    return $this->instantiate($this->db->table($this->entity_name)->select_by_id($id_col));
-  }
-  public function find_by_props($entity) {
-    if (get_class($entity) != $this->entity_name) return null;
-
-    $fields = array();
-
-    foreach ((new ReflectionClass($entity))->getProperties() as $property)
-    {
-      $ref = $property->getAttributes()[0];
-      try
       {
-        if ($ref->getName() == 'Core\Attributes\ID'
-        && $ref->getName() == 'Core\Attributes\Column'
-        )
-          $fields[$ref->getArguments()['name']] = $entity->{'get_'.$property->name}();
-
-        else if ($ref->getName() == 'Core\Attributes\ManyToOne')
-          # Get relative info;
-          foreach((new ReflectionClass($property->getType()->getName()))->getProperties() as $r_property)
-            if ($r_property->getAttributes()[0]->getName() == 'Core\Attributes\ID')
-              $fields[$ref->getArguments()['name']] = $entity->{'get_'.$property->getName()}()
-                ->{'get_'.$r_property->getName()}();
+        $id_col[$attribute->getArguments()['name']] = $id;
+        break;
       }
-      catch (Error $error){}
     }
 
+    return $this->instantiate($this->db->table($this->entity_table)->select_by_id($id_col));
+  }
+
+  public function find_by_props($fields, $cond=[null, '=']) {
     $objs = array();
-    foreach($this->db->table($this->entity_name)->select_by_fields($fields) as $obj)
+
+    foreach($this->db->table($this->entity_table)->select_by_fields($fields, $cond) as $obj)
       $objs[] = $this->instantiate($obj);
     return $objs;
 
@@ -219,7 +205,7 @@ class Repository
 
   public function count($fields = [])
   {
-    return $this->db->table($this->entity_name)->count_by_fields($fields);
+    return $this->db->table($this->entity_table)->count_by_fields($fields);
   }
 
   private function instantiate($obj)

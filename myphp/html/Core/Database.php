@@ -13,18 +13,19 @@ class Query
     $stmt = 'SELECT * FROM ' . $this->table;
     $result =$this->conn->query($stmt); 
 
+    echo $stmt;
     $objs = [];
     while ($obj = $result->fetch_object())
-      $objs[] = $obj;
+      $objs[] = $obj; 
     return $objs;
   }
 
-  public function select_by_fields($fields = [])
+  public function select_by_fields($fields = [], $cond)
   {
     if (!$fields) throw new mysqli_sql_exception('Fields in where clause cannot be empty');
     # Sql query
-    $query = 'SELECT * FROM ' . $this->table;
-    $query .= ' WHERE ' . implode('=?, ',array_keys($fields)) . '=?';
+    $query = 'SELECT * FROM ' . $this->table . ' WHERE ';
+    $query .= implode($cond[1] .'? ' . $cond[0] . ' ',array_keys($fields)) . $cond[1].'?';
 
     # Prepare statement
     $stmt = $this->conn->prepare($query);
@@ -48,7 +49,6 @@ class Query
     if (gettype($fields) == 'string') 
       return (int)$this->conn->query($query.' GROUP BY '.$fields)->fetch_array()[0];
     $query .= ' GROUP BY ' . implode(', ',array_keys($fields));
-    echo $query;
 
     # Prepare statement
     $stmt = $this->conn->prepare($query);

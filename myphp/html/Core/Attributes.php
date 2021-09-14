@@ -4,6 +4,8 @@ namespace Core;
 
 use Attribute;
 
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class Autowired {}
 #[Attribute]
 class RequestMapping 
 {

@@ -17,7 +17,7 @@ define ('FIND_BY', [
   'notlike' => ['or', 'not like'],
 ]);
 
-trait Service 
+trait ServiceTrait
 {
 
   public function __construct()
@@ -33,7 +33,6 @@ trait Service
       $interface = $refRepo->getType()->getName();
       $refRepo->setAccessible(true);
 
-      var_dump($interface);
       # Process unimplement method
       $userMethod = array_diff(get_class_methods($interface), get_class_methods('Core\IRepository'));
 

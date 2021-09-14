@@ -2,11 +2,11 @@
 
 namespace App\PHP;
 
-use Core\Service;
+use Core\ServiceTrait;
 
 class MajorService
 {
-  use Service;
+  use ServiceTrait;
 
   private MajorRepository $repository;
 

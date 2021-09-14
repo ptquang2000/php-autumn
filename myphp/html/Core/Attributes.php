@@ -8,6 +8,12 @@ class Service {}
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Autowired {}
 #[Attribute]
+class RequestMethod 
+{
+  const GET = 0;
+  const POST = 1;
+}
+#[Attribute]
 class RequestMapping 
 {
   public function __construct(public $value, public $method)  {}
@@ -29,6 +35,8 @@ class RequestMapping
     return null;
   }
 }
+#[Attribute(Attribute::TARGET_CLASS)]
+class Controller {}
 #[Attribute(Attribute::TARGET_CLASS)]
 class RestController {}
 #[Attribute(Attribute::TARGET_ALL)]

@@ -6,7 +6,7 @@ use ArgumentCountError;
 use ReflectionClass;
 use Exception;
 
-define ('Exception404', 'Path does not exist');
+define ('Exception404', 'Exception404: Path does not exist');
 
 function serialize($obj){
 	if (!$obj) return null;
@@ -28,16 +28,20 @@ function serialize($obj){
 class Router
 {
 	private static $url;
+	private static $contents;
 	private static function restcontroller_result_handler($result)
 	{
 		if (!$result) return;
 		if (is_iterable($result))
-			return implode('<br>',array_map(function($instance){
+			// return implode('<br>',array_map(function($instance){
+			// 	return json_encode(serialize($instance));
+			// }, $result));
+			return array_map(function($instance){
 				return json_encode(serialize($instance));
-			}, $result));
+			}, $result);
 		return json_encode(serialize($result));
 	}
-	private static function validate_url($method)
+	private static function check_matched_path($method)
 	{
 		$method_attr = $method->getAttributes()[0];
 		// check error: attribute defining path's variables
@@ -73,7 +77,8 @@ class Router
 	public static function route($url)
 	{
 		Router::$url = $url;
-		foreach (glob("app/php/*.php") as $filename) 
+		$df_app = glob("app/php/*.php");
+		foreach ($df_app as $filename) 
 		{
 			$class = str_replace('app/php/', 'App\\PHP\\',
 			str_replace('.php', '', $filename));
@@ -86,8 +91,8 @@ class Router
 				foreach($methods as $method)
 				{
 					if ($method->getAttributes()[0]->getName() == 'Core\RequestMapping')
-					{            
-						try {$df_parts = Router::validate_url($method);}
+					{
+						try {$df_parts = Router::check_matched_path($method);}
 						catch (Exception $e)
 						{
 							if ($e->getMessage() == Exception404) continue;
@@ -99,14 +104,18 @@ class Router
 						{	use Core\RestControllerTrait;	};
 						EOF;
 						eval($code);
-						echo Router::restcontroller_result_handler(
-							$controler->{$method->getName()}(...$df_parts));
+						Router::$contents = Router::restcontroller_result_handler(
+							$controler->{$method->getName()}(...$df_parts)) ?? '';
 						break;
 					}
 				}
-				break;
 			}
+			if (isset(Router::$contents)) break;
+			// path not found
+			if ($filename === $df_app[array_key_last($df_app)]) 
+				throw new Exception (Exception404);
 		}
+		echo Router::$contents;
 	}
 }
 	

@@ -2,16 +2,11 @@
 
 namespace App\PHP;
 
-// use Core\ServiceTrait;
-use Core\Service;
-use Core\Autowired;
+use Core\{Service, Autowired};
 
 #[Service]
 class StudentService
 {
-  // use ServiceTrait;
-
-  // private StudentRepository $repository;
 
   #[Autowired]
   private StudentRepository $repository;

@@ -14,19 +14,21 @@ class TestController
 
     #[RequestMapping(value:'/' , method:'GET')]
     public function get1()
-    {
-        var_dump($this->student_service->get_all_students());
+    {   
+        $a = $this->student_service->get_all_students();
+        return $a;
     }
-    #[RequestMapping(value:'/a' , method:'GET')]
-    public function get2()
-    {
-        echo "GET2";
-    }
-    // #[RequestMapping(value:'/$a' , method:'GET')]
-    // public function get3($a)
+    // #[RequestMapping(value:'/a' , method:'GET')]
+    // public function get2()
     // {
-    //     echo "GET3 $a";
+    //     echo "GET2";
     // }
+    #[RequestMapping(value:'/$a' , method:'GET')]
+    public function get3($a)
+    {
+        $a = $this->student_service->get_student_by_id($a);
+        return $a;
+    }
     // #[RequestMapping(value:'/' , method:'GET')]
     // public function get4($a)
     // {
@@ -52,11 +54,11 @@ class TestController
     // {
     //     echo "GET7 $a";
     // }
-    #[RequestMapping(value:'/a/$a' , method:'GET')]
-    public function get8($a)
-    {
-        echo "GET8 $a";
-    }
+    // #[RequestMapping(value:'/a/$a' , method:'GET')]
+    // public function get8($a)
+    // {
+    //     echo "GET8 $a";
+    // }
     // #[RequestMapping(value:'/$a/a' , method:'GET')]
     // public function get9($a)
     // {

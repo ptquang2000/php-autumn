@@ -22,8 +22,8 @@ trait RestControllerTrait
 {
 	public function autowired($class)
 	{
-		// Interface 
-		if (interface_exists($class))
+		// Repository Module
+		if (interface_exists($class) && is_subclass_of($class, 'Core\IRepository'))
 		{
 			$interface = $class;
 
@@ -36,7 +36,6 @@ trait RestControllerTrait
 			{
 				$method = str_replace('find_by_', '', $method_name);
 				$case=count($kw=array_intersect(explode('_', $method), array_keys(FIND_BY)));
-				echo '<br>';
 				if ($case == 0)
 				{
 					$unimp_methods[] = 
@@ -93,7 +92,6 @@ trait RestControllerTrait
 	}
 	public function __construct()
 	{
-		echo 'RestControllerTrait<br>';
 		$reflection = new ReflectionClass(get_parent_class($this));
 		
 		// instantiate autwired properties;

@@ -2,12 +2,12 @@
 
 namespace App\PHP;
 
-use Core\ServiceTrait;
+use Core\{Service, Autowired};
 
+#[Service]
 class MajorService
 {
-  use ServiceTrait;
-
+  #[Autowired]
   private MajorRepository $repository;
 
   public function get_all_major()

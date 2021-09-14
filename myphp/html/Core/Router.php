@@ -35,7 +35,7 @@ class Router
 			return implode('<br>',array_map(function($instance){
 				return json_encode(serialize($instance));
 			}, $result));
-		else json_encode(serialize($result));
+		return json_encode(serialize($result));
 	}
 	private static function validate_url($method)
 	{

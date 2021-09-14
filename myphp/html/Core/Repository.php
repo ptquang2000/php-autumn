@@ -122,13 +122,13 @@ class Repository
                 foreach ($reflection->getProperties() as $prop) {
                   if ($prop->getAttributes()[0]->getName() == 'Core\ID')
                   {
-                    var_dump($this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
+                    $this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
                       ->update([
                         $property->getAttributes()[0]->getArguments()['name']
                           =>null, #fk
                         $prop->getAttributes()[0]->getArguments()['name']
                           =>$m_obj->{'get_'.$prop->getName()}() #id
-                      ]));
+                      ]);
                     break;
                   }
                 }
@@ -161,7 +161,6 @@ class Repository
   public function find_by_id($id)
   {
     $id_col = array();
-
     foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
     {
       $attribute = $property->getAttributes()[0];
@@ -171,8 +170,8 @@ class Repository
         break;
       }
     }
-
-    return $this->instantiate($this->db->table($this->entity_table)->select_by_id($id_col));
+    $obj = $this->db->table($this->entity_table)->select_by_id($id_col);
+    return $obj ? $this->instantiate($obj) : $obj;
   }
 
   public function find_by_props($fields, $cond=[null, '=']) {

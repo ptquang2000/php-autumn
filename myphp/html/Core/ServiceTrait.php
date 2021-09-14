@@ -4,7 +4,7 @@ namespace Core;
 use ReflectionClass;
 use ErrorException;
 
-define ('FIND_BY', [
+define ('FIND_BYs', [
   'and'=> ['and', '='],
   'is'=> ['and', '='],
   'equal'=> ['and', '='],
@@ -22,7 +22,6 @@ trait ServiceTrait
 
   public function __construct()
   {
-
     $reflection = new ReflectionClass($this);
     $attributes = $reflection->getAttributes();
 

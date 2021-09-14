@@ -15,7 +15,6 @@ class TestController
     #[RequestMapping(value:'/' , method:'GET')]
     public function get1()
     {
-        echo "GET1";
         var_dump($this->student_service->get_all_students());
     }
     #[RequestMapping(value:'/a' , method:'GET')]

@@ -16,7 +16,6 @@ class Query
     $stmt = 'SELECT * FROM ' . $this->table;
     $result =$this->conn->query($stmt); 
 
-    echo $stmt;
     $objs = [];
     while ($obj = $result->fetch_object())
       $objs[] = $obj; 

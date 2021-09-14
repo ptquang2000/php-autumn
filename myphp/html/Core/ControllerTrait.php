@@ -2,7 +2,7 @@
 
 namespace Core;
 
-trait Controller
+trait ControllerTrait
 {
     public function __construct()
     {

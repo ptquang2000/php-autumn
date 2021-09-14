@@ -7,14 +7,15 @@ use App\PHP\StudentService;
 use Core\Autowired;
 
 #[RestController]
-class TestController
+class TestRestController
 {
     #[Autowired]
     private StudentService $student_service;
 
-    #[RequestMapping(value:'/' , method:RequestMethod::GET)]
+    #[RequestMapping(value:'/rest' , method:RequestMethod::GET)]
     public function get1()
     {   
+        echo 'testrestcontroller get1 <br>';
         $a = $this->student_service->get_all_students();
         return $a;
     }
@@ -23,9 +24,10 @@ class TestController
     // {
     //     echo "GET2";
     // }
-    #[RequestMapping(value:'/$a' , method:RequestMethod::GET)]
+    #[RequestMapping(value:'/rest/$a' , method:RequestMethod::GET)]
     public function get3($a)
     {
+        echo 'testrestcontroller get3 <br>';
         $a = $this->student_service->get_student_by_id($a);
         return $a;
     }

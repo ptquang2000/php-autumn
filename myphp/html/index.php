@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 include_once 'core\\Attributes.php';
 define("DL", "\\");
@@ -18,7 +19,9 @@ $url = $_SERVER['REQUEST_URI'];
 $url = preg_replace('/(\\/?\?.+)/', '', $url);
 
 use Core\Router;
+Router::setup();
 Router::route($url);
+echo Router::$contents;
 
 // use App\PHP\{StudentService, MajorService};
 

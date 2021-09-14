@@ -1,6 +1,6 @@
 <?php
 
-
+include_once 'core\\Attributes.php';
 define("DL", "\\");
 
 spl_autoload_register(function($class)
@@ -9,7 +9,7 @@ spl_autoload_register(function($class)
   $file = array_pop($parts);
   $path = __DIR__.DL.implode(DL,$parts).DL.$file.'.php';
   if (file_exists($path))
-    include_once $path; 
+    include_once $path;
 });
 
 // Routing

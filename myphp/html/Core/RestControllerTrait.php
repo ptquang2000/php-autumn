@@ -2,7 +2,7 @@
 
 namespace Core;
 
-trait RestController
+trait RestControllerTrait
 {
     public function __construct()
     {

@@ -7,9 +7,7 @@ use DOMDocument;
 use DOMXpath;
 
 define('XPATH_NODE', '//*[@*[contains(name(), "bk:")]]');
-define('XPATH_ATTR', '//@*[starts-with(name(), "bk:")]');
 define('XPATH_BLOCK', '//*[local-name()="block"]');
-define('XPATH_CHILD', '[@*[contains(name(), "bk:")]]');
 define('BK_TAG', [
 	'text'=>'bk:text',
 	'foreach'=>'bk:foreach'
@@ -24,42 +22,21 @@ trait ControllerTrait
 		$this->model = new Model();
 	}
 	
-	private function render_block($elements, $model, $name)
-	{
-		foreach($elements as $element)
-		{
-			# traverse through bk attributes
-			foreach(array_values(array_filter(
-				iterator_to_array($element->attributes), function($attr) {	
-					return preg_match_all('/^bk:.*$/', $attr->name);
-			})) as $attr)
-			{
-				if ($attr->name == BK_TAG['text'])
-					$element->nodeValue = $this->model->get_attribute(
-						$attr->value, [$name=>$model]);
-				else
-					$element->setAttribute(str_replace('bk:','',$attr->name),								$this->model->get_attribute(
-							$attr->value, [$name=>$model]));
-				$element->removeAttribute($attr->name);
-			}
-		}
-	}
-
-	private function edit_node($element, $attribute)
+	private function edit_node($node, $attribute=null)
 	{
 		# traverse through bk attributes
 		foreach(array_values(array_filter(
-			iterator_to_array($element->attributes), function($attr) {	
+			iterator_to_array($node->attributes), function($attr) {	
 				return preg_match_all('/^bk:.*$/', $attr->name);
 		})) as $attr)
 		{
 			if ($attr->name == BK_TAG['text'])
-				$element->nodeValue = $this->model->get_attribute(
+				$node->nodeValue = $this->model->get_attribute(
 					$attr->value, $attribute);
 			else
-				$element->setAttribute(str_replace('bk:','',$attr->name),								$this->model->get_attribute(
+				$node->setAttribute(str_replace('bk:','',$attr->name),								$this->model->get_attribute(
 						$attr->value, $attribute));
-			$element->removeAttribute($attr->name);
+			$node->removeAttribute($attr->name);
 		}
 	}
 
@@ -131,18 +108,8 @@ trait ControllerTrait
 			
 			// select node has bk: attribute
 			foreach($xml->query(XPATH_NODE) as $element)
-			{
-				# traverse through bk attributes
-				foreach(array_values(array_filter(
-					iterator_to_array($element->attributes), function($attr) {	
-						return preg_match_all('/^bk:.*$/', $attr->name);
-				})) as $attr)
-				{
-					if ($attr->name == BK_TAG['text'])
-						$element->nodeValue = $this->model->get_attribute($attr->value);
-					$element->removeAttribute($attr->name);
-				}
-			}
+				$this->edit_node($element);
+
 			echo $xml->document->saveHTML();
 		}
 		else echo $html;

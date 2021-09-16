@@ -32,6 +32,21 @@ class TestController
     {
         return 'index.html';
     }
+    #[RequestMapping(value:'/course-action' , method:RequestMethod::GET)]
+    public function courseaction()
+    {
+        echo 'course-action';
+    }
+    #[RequestMapping(value:'/login' , method:RequestMethod::GET)]
+    public function login()
+    {
+        echo 'login';
+    }
+    #[RequestMapping(value:'/logout' , method:RequestMethod::GET)]
+    public function logout()
+    {
+        echo 'logout';
+    }
     // #[RequestMapping(value:'/' , method:'GET')]
     // public function get4($a)
     // {

@@ -27,20 +27,23 @@ class Model
         if ($property->isPrivate() && $reflection->hasMethod('get_'.$variable[1]))
           return $instance->{'get_'.$variable[1]}();
       }
-      throw new \Exception ('Model "'.$variable[0].'" does not have property "'.$variable[1].'" or properly naming access modifier');
+      throw new \Exception ('Model Exception: Model "'.$variable[0].'" does not have property "'.$variable[1].'" or properly naming access modifier');
     }
     if (preg_match_all('/^\$\{[a-z|A-Z|_][a-z|A-Z|_|0-9]*\}$/', $name))
     {
       $key = rtrim(substr($name, 2), '}');
       if (array_key_exists($key, $attr))
         return $attr[$key];
-      throw new \Exception ('Model "'.$key.'" does not exist');
+      throw new \Exception ('Model Exception: Model "'.$key.'" does not exist');
     }
     if (preg_match_all('/^\@\{.*\}$/', $name))
     {
-      return str_replace('@{', '', rtrim($name,'}'));
+      $url = str_replace('@{', '', rtrim($name,'}'));
+      if (!array_key_exists($url, Router::$paths))
+        throw new \Exception ("Path Exception: Undefined path \"$name\" on line ");
+      return $url;
     }
-    throw new \Exception ("Invalid model $name");
+    throw new \Exception ("Model Exception: Invalid model $name");
   }
 }
 ?>

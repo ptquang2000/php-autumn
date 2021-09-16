@@ -30,13 +30,23 @@ trait ControllerTrait
 				return preg_match_all('/^bk:.*$/', $attr->name);
 		})) as $attr)
 		{
-			if ($attr->name == BK_TAG['text'])
-				$node->nodeValue = $this->model->get_attribute(
-					$attr->value, $attribute);
-			else
-				$node->setAttribute(str_replace('bk:','',$attr->name),								$this->model->get_attribute(
-						$attr->value, $attribute));
-			$node->removeAttribute($attr->name);
+			try
+			{
+				if ($attr->name == BK_TAG['text'])
+					$node->nodeValue = $this->model->get_attribute(
+						$attr->value, $attribute);
+				else $node->setAttribute(str_replace('bk:','',$attr->name),
+					$this->model->get_attribute($attr->value, $attribute));
+				$node->removeAttribute($attr->name);
+			} catch (\Exception $e)
+			{
+				$msg = explode(':', $e->getMessage())[0];
+				if ($msg == 'Model Exception')
+					throw new \Exception ($e->getMessage().' on line '.$this->node->getLineNo());
+				else if ($msg == 'Path Exception')
+					throw new \Exception ($e->getMessage().$node->getLineNo());
+				throw $e;
+			}
 		}
 	}
 
@@ -63,9 +73,7 @@ trait ControllerTrait
 	public function render($html)
 	{
 		if (file_exists(__STATIC__.$html)) 
-		{
 			include __STATIC__.$html;
-		}
 		else if (file_exists(__TEMPLATE__.$html))
 		{
 			// load document
@@ -75,21 +83,21 @@ trait ControllerTrait
 			$document->formatOutput = true;
 			$document->loadHTMLFile(__TEMPLATE__.$html);
 			libxml_use_internal_errors($internalErrors);
-			
+		
 			// select node is bk:block
 			$xml = new DOMXpath($document);
 			foreach($xml->query(XPATH_BLOCK) as $element)
 			{
 				$attr = array_values(array_filter(
-					iterator_to_array($element->attributes), function($attr) {	
-						return preg_match_all('/^bk:.*$/', $attr->name);
-				}))[0];
+					iterator_to_array($element->attributes),
+					function($attr) {return preg_match_all('/^bk:.*$/', $attr->name);})
+				)[0];
 				$regex = '/^\s*[a-z|A-Z|_][a-z|A-Z|_|0-9]*\s*\:\s*\$\{[a-z|A-Z|_][a-z|A-Z|_|0-9]*\}\s*$/';
 				if ($attr->name == BK_TAG['foreach'] && preg_match_all($regex, $attr->value))
 				{
 					$values = array_map(function($e){
 						return ltrim(rtrim($e));
-						},explode(':', $attr->value));
+					},explode(':', $attr->value));
 					
 					// append child from template
 					$new_xml = new DOMXpath($document);
@@ -97,23 +105,23 @@ trait ControllerTrait
 					$parent_node = $element->parentNode;
 					foreach($models as $model)
 					{
-						$node = $this->traverse_child($element, $new_xml, [
-							$values[0]=>$model]);
+						$node = $this->traverse_child($element, $new_xml, [$values[0]=>$model]);
 						while ($node->hasChildNodes())
 							$parent_node->insertBefore($node->lastChild, $element->nextSibling);
 					}
 					$parent_node->removeChild($element);
 				}
 			}
-			
+						
 			// select node has bk: attribute
 			foreach($xml->query(XPATH_NODE) as $element)
 				$this->edit_node($element);
-
+			
+			// print out dynamic html
 			echo $xml->document->saveHTML();
 		}
 		else echo $html;
 	}
 }
-		
+
 ?>

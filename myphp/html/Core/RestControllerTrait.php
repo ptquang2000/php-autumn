@@ -20,6 +20,34 @@ define ('FIND_BY', [
 
 trait RestControllerTrait
 {
+	public static function serialize($obj){
+		if (!$obj) return null;
+		$props = (new ReflectionClass($obj))->getProperties();
+		$new_ins = new \stdClass();
+		foreach($props as $prop)
+		{
+			$new_ins->{$prop->getName()} = $obj->{'get_'.$prop->getName()}();
+			if (!is_scalar($new_ins->{$prop->getName()}))
+			{
+				$parsed_obj = RestControllerTrait::serialize($new_ins->{$prop->getName()});
+				if ($parsed_obj) $new_ins->{$prop->getName()} = $parsed_obj;
+				else unset($new_ins->{$prop->getName()} );
+			}
+		}
+		return $new_ins;
+	}
+
+	public static function encode($result)
+	{
+		if (!$result) return;
+		if (is_iterable($result))
+			echo '['.implode(',',array_map(function($instance){
+				return json_encode(RestControllerTrait::serialize($instance));
+			}, $result)).']';
+		else
+			echo json_encode(RestControllerTrait::serialize($result));
+	}
+
 	public function autowired($class)
 	{
 		// Repository Module

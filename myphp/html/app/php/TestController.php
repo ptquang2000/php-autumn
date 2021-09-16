@@ -10,8 +10,17 @@ class TestController
     #[RequestMapping(value:'/' , method:RequestMethod::GET)]
     public function get1()
     {   
-        echo 'testcontroller get1 <br>';
-        return '<h1>Hello World<h2>';
+		$this->model->add_attribute('courses' , [new class {
+			public $id = 1;
+			public $name = 'joshua';
+		},new class {
+			public $id = 2;
+			public $name = 'giorino giovana';
+		},new class {
+			public $id = 3;
+			public $name = 'jotaro';
+		}]);
+        return 'template.html';
     }
     // #[RequestMapping(value:'/a' , method:'GET')]
     // public function get2()
@@ -21,8 +30,7 @@ class TestController
     #[RequestMapping(value:'/$a' , method:RequestMethod::GET)]
     public function get3($a)
     {
-        echo 'testcontroller get3 <br>';
-        return $a;
+        return 'index.html';
     }
     // #[RequestMapping(value:'/' , method:'GET')]
     // public function get4($a)

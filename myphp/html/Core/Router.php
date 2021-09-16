@@ -11,38 +11,11 @@ function Error404($url=''){
 	return "Error404: Path $url does not exist";
 };
 
-function serialize($obj){
-	if (!$obj) return null;
-	$props = (new ReflectionClass($obj))->getProperties();
-	$new_ins = new \stdClass();
-	foreach($props as $prop)
-	{
-		$new_ins->{$prop->getName()} = $obj->{'get_'.$prop->getName()}();
-		if (!is_scalar($new_ins->{$prop->getName()}))
-		{
-			$parsed_obj = serialize($new_ins->{$prop->getName()});
-			if ($parsed_obj) $new_ins->{$prop->getName()} = $parsed_obj;
-			else unset($new_ins->{$prop->getName()} );
-		}
-	}
-	return $new_ins;
-}
-
 class Router
 {
 	private static $url;
-	public static $contents;
 	private static $paths = array();
 
-	private static function restcontroller_result_handler($result)
-	{
-		if (!$result) return;
-		if (is_iterable($result))
-			return '['.implode(',',array_map(function($instance){
-				return json_encode(serialize($instance));
-			}, $result)).']';
-		return json_encode(serialize($result));
-	}
 	public static function setup()
 	{
 		$df_app = glob("app/php/*.php");
@@ -70,12 +43,15 @@ class Router
 								'Path "'.$attr_args['value'].
 								'" in method "'.$method->getName().
 								'" defines params error');
-						// echo '------1<br>';
+						// check if path has been defined 		
 						if (array_key_exists($attr_args['value'], Router::$paths))
 							throw new Exception(
 								'Path "'.$attr_args['value'].
-								'" has already defined in class "'.Router::$paths[$attr_args['value']]['class'].
-								'" method "'.	Router::$paths[$attr_args['value']]['class_method']);
+								'" has already defined in class "'.
+								Router::$paths[$attr_args['value']]['class'].
+								'"\'s method "'.
+								Router::$paths[$attr_args['value']]['class_method']).
+								'"';
 
 						Router::$paths[$attr_args['value']] = [
 							'method'=> $attr_args['method'] ?? RequestMethod::GET,
@@ -107,22 +83,29 @@ class Router
 	public static function route($url)
 	{
 		Router::$url = $url;
+		if (in_array(pathinfo($url, PATHINFO_EXTENSION), ['js', 'css']))
+		{
+			$url = str_replace('/', DL, $url);
+			$url = 'app'.DL.'static'.DL.$url;
+			if (file_exists($url)) include $url;
+			return;
+		}
 		if (array_key_exists(Router::$url, Router::$paths))
 		{
 			$class = Router::$paths[$url]['class'];
 			$type = Router::$paths[$url]['type'];
 			// instantiate controller
 			$code = <<< EOF
-			\$controler = new class extends $class
+			\$controller = new class extends $class
 			{	use $type;	};
 			EOF;
 			eval($code);
 			if ($type == 'Core\RestControllerTrait')
-				Router::$contents = Router::restcontroller_result_handler($controler->{
-					Router::$paths[Router::$url]['class_method']}()) ?? '';
+				RestControllerTrait::encode(
+					$controller->{Router::$paths[Router::$url]['class_method']}()	);
 			else if ($type == 'Core\ControllerTrait')
-				Router::$contents = $controler->{
-					Router::$paths[Router::$url]['class_method']}() ?? '';	
+				$controller->render(
+					$controller->{Router::$paths[Router::$url]['class_method']}() );	
 		}
 		else
 		{
@@ -141,16 +124,16 @@ class Router
 					$type = Router::$paths[$path]['type'];
 					// instantiate controller
 					$code = <<< EOF
-					\$controler = new class extends $class
+					\$controller = new class extends $class
 					{	use $type;	};
 					EOF;
 					eval($code);
 					if ($type == 'Core\RestControllerTrait')
-						Router::$contents = Router::restcontroller_result_handler($controler->{
-							$props['class_method']}(...$df_parts)) ?? '';
+						RestControllerTrait::encode(
+							$controller->{$props['class_method']}(...$df_parts)	);
 					else if ($type == 'Core\ControllerTrait')
-						Router::$contents = $controler->{
-							$props['class_method']}(...$df_parts) ?? '';
+						$controller->render(
+							$controller->{$props['class_method']}(...$df_parts) );
 					break;
 				}
 				if ($path === array_key_last(Router::$paths))

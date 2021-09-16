@@ -12,3 +12,8 @@ abc/
 /abc//xyz/
 /abc/xyz/abc/xyz
 ^\/([^\/]+(\/[^\/]+)*)*$
+
+${course.name}
+${_course.name}
+${course9.name}
+${1course.name}

@@ -2,5 +2,8 @@ RewriteEngine On
 
 ReWriteCond %{REQUEST_FILENAME} !-d
 ReWriteCond %{REQUEST_FILENAME} !-f
-
 ReWriteRule ^(.*)$ index.php/$1 [L]
+
+ReWriteRule ^core/(.*)$ index.php/$1 [L]
+
+ReWriteRule ^app/(.*)$ index.php/$1 [L]

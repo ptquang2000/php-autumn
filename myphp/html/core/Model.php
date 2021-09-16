@@ -36,14 +36,18 @@ class Model
         return $attr[$key];
       throw new \Exception ('Model Exception: Model "'.$key.'" does not exist');
     }
-    if (preg_match_all('/^\@\{.*\}$/', $name))
+    throw new \Exception ("Model Exception: Invalid model template syntax \"$name\"");
+  }
+  public static function get_action($path)
+  {
+    if (preg_match_all('/^\@\{.*\}$/', $path))
     {
-      $url = str_replace('@{', '', rtrim($name,'}'));
+      $url = str_replace('@{', '', rtrim($path,'}'));
       if (!array_key_exists($url, Router::$paths))
-        throw new \Exception ("Path Exception: Undefined path \"$name\" on line ");
+        throw new \Exception ("Path Exception: Undefined path \"$path\" on line ");
       return $url;
     }
-    throw new \Exception ("Model Exception: Invalid model $name");
+    throw new \Exception ("Path Exception: Invalid path template syntax \"$path\"");
   }
 }
 ?>

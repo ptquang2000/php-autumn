@@ -10,8 +10,8 @@ class Autowired {}
 #[Attribute]
 class RequestMethod 
 {
-  const GET = 0;
-  const POST = 1;
+  const GET = 'GET';
+  const POST = 'POST';
 }
 #[Attribute]
 class RequestMapping 

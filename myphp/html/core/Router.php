@@ -14,7 +14,7 @@ function Error404($url=''){
 class Router
 {
 	private static $url;
-	private static $paths = array();
+	public static $paths = array();
 
 	public static function setup()
 	{
@@ -83,7 +83,7 @@ class Router
 	public static function route($url)
 	{
 		Router::$url = $url;
-		if (in_array(pathinfo($url, PATHINFO_EXTENSION), ['js', 'css']))
+		if (pathinfo($url, PATHINFO_EXTENSION))
 		{
 			$url = str_replace('/', DL, $url);
 			$url = 'app'.DL.'static'.DL.$url;

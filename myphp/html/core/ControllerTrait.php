@@ -7,9 +7,7 @@ use DOMDocument;
 use DOMXpath;
 
 define('XPATH_NODE', '//*[@*[contains(name(), "bk:")]]');
-define('XPATH_ATTR', '//@*[starts-with(name(), "bk:")]');
 define('XPATH_BLOCK', '//*[local-name()="block"]');
-define('XPATH_CHILD', '[@*[contains(name(), "bk:")]]');
 define('BK_TAG', [
 	'text'=>'bk:text',
 	'foreach'=>'bk:foreach'
@@ -24,42 +22,31 @@ trait ControllerTrait
 		$this->model = new Model();
 	}
 	
-	private function render_block($elements, $model, $name)
-	{
-		foreach($elements as $element)
-		{
-			# traverse through bk attributes
-			foreach(array_values(array_filter(
-				iterator_to_array($element->attributes), function($attr) {	
-					return preg_match_all('/^bk:.*$/', $attr->name);
-			})) as $attr)
-			{
-				if ($attr->name == BK_TAG['text'])
-					$element->nodeValue = $this->model->get_attribute(
-						$attr->value, [$name=>$model]);
-				else
-					$element->setAttribute(str_replace('bk:','',$attr->name),								$this->model->get_attribute(
-							$attr->value, [$name=>$model]));
-				$element->removeAttribute($attr->name);
-			}
-		}
-	}
-
-	private function edit_node($element, $attribute)
+	private function edit_node($node, $attribute=null)
 	{
 		# traverse through bk attributes
 		foreach(array_values(array_filter(
-			iterator_to_array($element->attributes), function($attr) {	
+			iterator_to_array($node->attributes), function($attr) {	
 				return preg_match_all('/^bk:.*$/', $attr->name);
 		})) as $attr)
 		{
-			if ($attr->name == BK_TAG['text'])
-				$element->nodeValue = $this->model->get_attribute(
-					$attr->value, $attribute);
-			else
-				$element->setAttribute(str_replace('bk:','',$attr->name),								$this->model->get_attribute(
-						$attr->value, $attribute));
-			$element->removeAttribute($attr->name);
+			try
+			{
+				if ($attr->name == BK_TAG['text'])
+					$node->nodeValue = $this->model->get_attribute(
+						$attr->value, $attribute);
+				else $node->setAttribute(str_replace('bk:','',$attr->name),
+					$this->model->get_attribute($attr->value, $attribute));
+				$node->removeAttribute($attr->name);
+			} catch (\Exception $e)
+			{
+				$msg = explode(':', $e->getMessage())[0];
+				if ($msg == 'Model Exception')
+					throw new \Exception ($e->getMessage().' on line '.$this->node->getLineNo());
+				else if ($msg == 'Path Exception')
+					throw new \Exception ($e->getMessage().$node->getLineNo());
+				throw $e;
+			}
 		}
 	}
 
@@ -86,9 +73,7 @@ trait ControllerTrait
 	public function render($html)
 	{
 		if (file_exists(__STATIC__.$html)) 
-		{
 			include __STATIC__.$html;
-		}
 		else if (file_exists(__TEMPLATE__.$html))
 		{
 			// load document
@@ -98,21 +83,21 @@ trait ControllerTrait
 			$document->formatOutput = true;
 			$document->loadHTMLFile(__TEMPLATE__.$html);
 			libxml_use_internal_errors($internalErrors);
-			
+		
 			// select node is bk:block
 			$xml = new DOMXpath($document);
 			foreach($xml->query(XPATH_BLOCK) as $element)
 			{
 				$attr = array_values(array_filter(
-					iterator_to_array($element->attributes), function($attr) {	
-						return preg_match_all('/^bk:.*$/', $attr->name);
-				}))[0];
+					iterator_to_array($element->attributes),
+					function($attr) {return preg_match_all('/^bk:.*$/', $attr->name);})
+				)[0];
 				$regex = '/^\s*[a-z|A-Z|_][a-z|A-Z|_|0-9]*\s*\:\s*\$\{[a-z|A-Z|_][a-z|A-Z|_|0-9]*\}\s*$/';
 				if ($attr->name == BK_TAG['foreach'] && preg_match_all($regex, $attr->value))
 				{
 					$values = array_map(function($e){
 						return ltrim(rtrim($e));
-						},explode(':', $attr->value));
+					},explode(':', $attr->value));
 					
 					// append child from template
 					$new_xml = new DOMXpath($document);
@@ -120,33 +105,23 @@ trait ControllerTrait
 					$parent_node = $element->parentNode;
 					foreach($models as $model)
 					{
-						$node = $this->traverse_child($element, $new_xml, [
-							$values[0]=>$model]);
+						$node = $this->traverse_child($element, $new_xml, [$values[0]=>$model]);
 						while ($node->hasChildNodes())
 							$parent_node->insertBefore($node->lastChild, $element->nextSibling);
 					}
 					$parent_node->removeChild($element);
 				}
 			}
-			
+						
 			// select node has bk: attribute
 			foreach($xml->query(XPATH_NODE) as $element)
-			{
-				# traverse through bk attributes
-				foreach(array_values(array_filter(
-					iterator_to_array($element->attributes), function($attr) {	
-						return preg_match_all('/^bk:.*$/', $attr->name);
-				})) as $attr)
-				{
-					if ($attr->name == BK_TAG['text'])
-						$element->nodeValue = $this->model->get_attribute($attr->value);
-					$element->removeAttribute($attr->name);
-				}
-			}
+				$this->edit_node($element);
+			
+			// print out dynamic html
 			echo $xml->document->saveHTML();
 		}
 		else echo $html;
 	}
 }
-		
+
 ?>

@@ -2,6 +2,7 @@
 session_start();
 
 include_once 'core\\Attributes.php';
+include_once 'core\\Functions.php';
 define("DL", "\\");
 
 spl_autoload_register(function($class)
@@ -19,12 +20,7 @@ define('__TEMPLATE__', 'app'.DL.'templates'.DL);
 // Routing
 $url = $_SERVER['REQUEST_URI'];
 // $url = preg_replace('/(^\/)/', '', $url);
-$url = preg_replace('/(\\/?\?.+)/', '', $url);
-
-function prettify_vardump($data)
-{
-  echo '<pre>' , var_dump($data) , '</pre>';
-}
+$url = preg_replace('/(\\/?\?.*)/', '', $url);
 
 use Core\Router;
 Router::setup();

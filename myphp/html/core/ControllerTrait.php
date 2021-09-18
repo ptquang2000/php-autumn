@@ -10,16 +10,23 @@ define('XPATH_NODE', '//*[@*[contains(name(), "bk:")]]');
 define('XPATH_BLOCK', '//*[local-name()="block"]');
 define('BK_TAG', [
 	'text'=>'bk:text',
-	'foreach'=>'bk:foreach'
+	'foreach'=>'bk:foreach',
+	'action'=>'bk:action'
 ]);
 
 trait ControllerTrait
 {
-	public Model $model;
+	private Model $model;
 
-	public function __construct()
+	// public function __construct()
+	// {
+	// 	$this->model = new Model();
+	// }
+
+	public function init_model()
 	{
 		$this->model = new Model();
+		return $this->model;
 	}
 	
 	private function edit_node($node, $attribute=null)
@@ -35,6 +42,9 @@ trait ControllerTrait
 				if ($attr->name == BK_TAG['text'])
 					$node->nodeValue = $this->model->get_attribute(
 						$attr->value, $attribute);
+				else if ($attr->name == BK_TAG['action'])
+					$node->setAttribute(str_replace('bk:','',$attr->name),
+					Model::get_action($attr->value));
 				else $node->setAttribute(str_replace('bk:','',$attr->name),
 					$this->model->get_attribute($attr->value, $attribute));
 				$node->removeAttribute($attr->name);
@@ -42,7 +52,7 @@ trait ControllerTrait
 			{
 				$msg = explode(':', $e->getMessage())[0];
 				if ($msg == 'Model Exception')
-					throw new \Exception ($e->getMessage().' on line '.$this->node->getLineNo());
+					throw new \Exception ($e->getMessage().' on line '.$node->getLineNo());
 				else if ($msg == 'Path Exception')
 					throw new \Exception ($e->getMessage().$node->getLineNo());
 				throw $e;
@@ -80,7 +90,7 @@ trait ControllerTrait
 			$internalErrors = libxml_use_internal_errors(true);
 			$document = new DOMDocument();
 			$document->preserveWhiteSpace = false;
-			$document->formatOutput = true;
+			// $document->formatOutput = true;
 			$document->loadHTMLFile(__TEMPLATE__.$html);
 			libxml_use_internal_errors($internalErrors);
 		

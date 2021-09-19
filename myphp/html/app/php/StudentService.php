@@ -47,9 +47,9 @@ class StudentService
 
   }
 
-  public function test_delete()
+  public function test_delete($student)
   {
-
+    return $this->test_repository->delete($student);
   }
 
   public function test_save($student)

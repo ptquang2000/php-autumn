@@ -32,14 +32,14 @@ class CourseService
 
   }
 
-  public function test_delete()
+  public function test_delete($course)
   {
-
+    return $this->test_repository->delete($course);
   }
 
-  public function test_save()
+  public function test_save($course)
   {
-
+    return $this->test_repository->save($course);
   }
 }
 

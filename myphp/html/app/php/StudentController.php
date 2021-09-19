@@ -44,7 +44,10 @@ class StudentController
   #[RequestMapping(value: '/student/$action', method:Requestmethod::POST)]
   public function post_student(Student $student, $action)
   {
-    return $this->test_service->test_save($student);
+    if ($action == 'save')
+      return $this->test_service->test_save($student);
+    else if ($action == 'delete')
+      return $this->test_service->test_delete($student);
   }
 
 

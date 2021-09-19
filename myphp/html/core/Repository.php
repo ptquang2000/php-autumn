@@ -8,20 +8,11 @@ use ReflectionClass;
 class Repository 
 {
   private $db;
-  private $entity_name;
-  private $entity_table;
-  public $parent = NULL;
   private $_info;
 
   public function __construct()
   {
     $interface = (new ReflectionClass($this))->getInterfaceNames()[0];
-
-    $class = 'App\\PHP\\'.(new ReflectionClass($interface))->getAttributes()[0]->getArguments()['class'];
-    $this->entity_name = $class;
-
-    $this->entity_table = (new ReflectionClass($class))->getAttributes()[0]->getArguments()['name'];
-
     $this->_info = setup_reflection($interface);
 
     $config = parse_ini_file('config.ini');
@@ -39,7 +30,7 @@ class Repository
 
     $id_col = [
       $this->_info['id']['column'] 
-        => $entity->{'get_'.$this->_info['id']['name']} ?? null
+        => $entity->{'get_'.$this->_info['id']['name']}() ?? null
     ];
 
     $fields = array_combine(
@@ -66,77 +57,45 @@ class Repository
 
   public function delete($entity)
   {
-    if (get_class($entity) != $this->entity_name) return null;
-
     $id_col = array();
-
-    $m_classes = array();
-
-    foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
-    {
-      $attribute = $property->getAttributes()[0];
-      if ($attribute->getName() == 'Core\ID')
-        $id_col[$attribute->getArguments()['name']] = $entity->{'get_'.$property->name}();
-      else if ($attribute->getName() == 'Core\OneToMany')
-      {
-        if (isset($attribute->getArguments()['cascade']))
-          $m_classes[] = array_merge($attribute->getArguments(), ['property' => $property->getName()]);
-      }
-    }
-    if ($m_classes)
-    {
-      $this->db->get_conn()->begin_transaction(); 
-      try{
-        foreach($m_classes as $m_class)
-        {
-          foreach (($reflection=new ReflectionClass($m_class['map_by']))->getProperties() as $property) {
-            if ($property->getAttributes()[0]->getName() == 'Core\ID'
-            && $m_class['cascade'] == 1)
-            {
-              foreach ($this->instantiate($this->db->table($this->entity_table)
-              ->select_by_id($id_col))->{'get_'.$m_class['property']}() as $m_obj)
-              
-                  $this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
-                    ->delete([$property->getAttributes()[0]->getArguments()['name']
-                      =>$m_obj->{'get_'.$property->getName()}()]);
-              break;
-            }
-            else if ($property->getAttributes()[0]->getName() == 'Core\ManyToOne'
-            && $m_class['cascade'] == 0
-            && $property->getType()->getName() == $this->entity_name)
-            {
-              foreach ($this->instantiate($this->db->table($this->entity_table)
-              ->select_by_id($id_col))->{'get_'.$m_class['property']}() as $m_obj)
-              {
-                foreach ($reflection->getProperties() as $prop) {
-                  if ($prop->getAttributes()[0]->getName() == 'Core\ID')
-                  {
-                    $this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
-                      ->update([
-                        $property->getAttributes()[0]->getArguments()['name']
-                          =>null, #fk
-                        $prop->getAttributes()[0]->getArguments()['name']
-                          =>$m_obj->{'get_'.$prop->getName()}() #id
-                      ]);
-                    break;
-                  }
-                }
-              }
-              break;
-            }
-          }
-        }
-        $this->db->table($this->entity_table)->delete($id_col);
-        $this->db->get_conn()->commit();
-      }
-      catch (mysqli_sql_exception $exception)
-      {
-        $this->db->get_conn()->rollback(); 
-        throw $exception;
-      }
-    }
+    if (!is_scalar($entity) && get_class($entity) == $this->_info['class']) 
+      $id_col[$this->_info['id']['column']] = $entity->
+        {'get_'.$this->_info['id']['name']}() ?? null;
     else
-      $this->db->table($this->entity_table)->delete($id_col);
+      $id_col[$this->_info['id']['column']] = $entity;
+
+    $this->db->get_conn()->begin_transaction(); 
+    try{
+      foreach($this->_info['1-n'] as $info)
+      {
+        $fk_entities = $this->instantiate(
+          $this->db->table($this->_info['table'])
+          ->select_by_id($id_col)
+          )->{'get_'.$info['name']}();
+        if ($info['cascade'] == OneToMany::DELETE)
+          foreach($fk_entities as $fk_entity)
+            $this->db->table($info['mapby']['table'])
+            ->delete([$info['mapby']['id']['column'] 
+              => $fk_entity->{'get_'.$info['mapby']['id']['name']}()
+            ]);
+        else if ($info['cascade'] == OneToMany::SETNULL)
+          foreach($fk_entities as $fk_entity)
+            $this->db->table($info['table'])
+            ->update([
+              $info['mapby']['n-1'][$this->_info['class']]['column']
+                => null, #fk
+              $info['mapby']['id']['column'] 
+                => $fk_entity->{'get_'.$info['mapby']['id']['name']}() #id
+            ]);
+      }
+      $this->db->table($this->_info['table'])->delete($id_col);
+      $this->db->get_conn()->commit();
+    }
+    catch (mysqli_sql_exception $exception)
+    {
+      $this->db->get_conn()->rollback(); 
+      throw $exception;
+    }
   }
 
   public function find_all()
@@ -170,7 +129,7 @@ class Repository
 
   public function count($fields = [])
   {
-    return $this->db->table($this->entity_table)->count_by_fields($fields);
+    return $this->db->table($this->_info['table'])->count_by_fields($fields);
   }
 
   private function instantiate($obj, $info=null)

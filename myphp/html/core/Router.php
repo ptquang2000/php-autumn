@@ -56,9 +56,13 @@ class Router
 					if (array_diff_uassoc($path_params, $method_para, function ($a, $b) 
 						use ($path_model){
 						$idx = array_key_first($path_model);
-						if ($b < $idx)
-							return $a === $b ? 0 : -1;
-						return $a === ($b-1) ? 0 : -1;
+						if ($idx)
+						{
+							if ($b < $idx)
+								return $a === $b ? 0 : -1;
+							return $a === ($b-1) ? 0 : -1;
+						}
+						return $a === $b ? 0 : -1;
 					}))
 						throw new ArgumentCountError(
 							'Path "'.$attr_args['value'].
@@ -72,8 +76,8 @@ class Router
 							'" has already defined in class "'.
 							Router::$paths[$attr_args['value']]['class'].
 							'"\'s method "'.
-							Router::$paths[$attr_args['value']]['class_method']).
-							'"';
+							Router::$paths[$attr_args['value']]['class_method'].
+							'"');
 
 					Router::$paths[$attr_args['value']] = [
 						'method'=> $attr_args['method'] ?? RequestMethod::GET,

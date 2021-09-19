@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM php:8.0.10-apache-bullseye
 RUN apt update && \
 apt install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev libxml2-dev libcurl4-gnutls-dev && \
 docker-php-ext-install -j$(nproc) mysqli && \

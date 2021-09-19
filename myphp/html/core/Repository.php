@@ -11,6 +11,7 @@ class Repository
   private $entity_name;
   private $entity_table;
   public $parent = NULL;
+  private $_info;
 
   public function __construct()
   {
@@ -20,6 +21,8 @@ class Repository
     $this->entity_name = $class;
 
     $this->entity_table = (new ReflectionClass($class))->getAttributes()[0]->getArguments()['name'];
+
+    $this->_info = setup_reflection($interface);
 
     $config = parse_ini_file('config.ini');
 
@@ -194,67 +197,45 @@ class Repository
     return $this->db->table($this->entity_table)->count_by_fields($fields);
   }
 
-  private function instantiate($obj)
+  private function instantiate($obj, $info=null)
   {
-    $entity = new $this->entity_name();
+    $info = $info ?? $this->_info;
+    $entity = new $info['class']();
 
-    foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
+    // set id
+    $value = $obj->{$info['id']['column']};
+    $entity->{'set_'.$info['id']['name']}($value);
+    // set other property
+    foreach ($info['props'] as $prop)
     {
-      $attribute = $property->getAttributes()[0];
-      if ($attribute->getName() == 'Core\ID' || $attribute->getName() == 'Core\Column')
-      {
-        $value = $obj->{$attribute->getArguments()['name']};
-        // settype($value, $property->getType());
-        $entity->{'set_'.$property->name}($value);
-      }
-      else if ($attribute->getName() == 'Core\ManyToOne')
-      {
-        $fk_class = $property->getType()->getName();
-        if ($fk_id=$obj->{$attribute->getArguments()['name']})
-        {
-          $ref_col_name = $attribute->getArguments()['ref_col_name'];
-          $ref_table_name = (new ReflectionClass($fk_class))->getAttributes()[0]->getArguments()['name'];
-          $entity->{'set_'.$property->name}(
-            $this->instantiate_related(
-              $fk_class, 
-              $this->db->table($ref_table_name)
-                ->select_by_id([$ref_col_name => $fk_id])
-          ));
-        }
-      }
-      else if ($attribute->getName() == 'Core\OneToMany')
-      {
-        $m_class = $attribute->getArguments()['map_by'];
-        $reflection = new ReflectionClass($m_class);
-        $m_objs = array();
-        foreach($reflection->getProperties() as $m_property)
-          if ($m_property->getAttributes()[0]->getName() == 'Core\ManyToOne')
-          {
-            $r_col = $m_property->getAttributes()[0]->getArguments()['name'];
-            $r_col_name = $m_property->getAttributes()[0]->getArguments()['ref_col_name'];
-            foreach(
-            $this->db->table($reflection->getAttributes()[0]->getArguments()['name'])
-              ->select_by_fields([$r_col => $obj->$r_col_name])
-            as $m_obj)
-              $m_objs[] = $this->instantiate_related($m_class, $m_obj);
-            $entity->{'set_'.$property->getName()}($m_objs);
-          }
-      }
+      $value = $obj->{$prop['column']};
+      $entity->{'set_'.$prop['name']}($value);
     }
-    return $entity;
-  }
-  private function instantiate_related($class, $obj) 
-  {
-    $entity = new $class();
-    foreach((new ReflectionClass($class))->getProperties() as $property)
+    // set n-1 reletionship
+    foreach ($info['n-1'] as $prop)
     {
-      $ref = $property->getAttributes()[0];
-      if ($ref->getName() == 'Core\ID' || $ref->getName() == 'Core\Column')
-      {
-        $value = $obj->{$ref->getArguments()['name']};
-        // settype($value, $property->getType());
-        $entity->{'set_'.$property->name}($value);
-      }
+      $fk_id = $obj->{$prop['column']};
+      if (!$fk_id) continue;
+      $entity->{'set_'.$prop['name']}($this->instantiate(
+        $this->db->table($prop['mapby']['table'])
+        ->select_by_id([
+              $prop['mapby']['id']['column'] => $fk_id
+            ]),
+        $prop['mapby']
+      ));
+    }
+    // set 1-n relationship
+    foreach ($info['1-n'] as $prop)
+    {
+      $r_entities = $this->db->table($prop['mapby']['table'])
+        ->select_by_fields([
+          $prop['mapby']['id']['column'] => $obj->{$prop['id']['name']}
+      ]);
+      $entity->{'set_'.$prop['name']}(array_walk(
+        $r_entities,
+        [$this, 'instantiate'],
+        $prop['mapby']
+      ));
     }
     return $entity;
   }

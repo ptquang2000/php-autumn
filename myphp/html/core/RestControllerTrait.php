@@ -29,7 +29,12 @@ trait RestControllerTrait
 			$new_ins->{$prop->getName()} = $obj->{'get_'.$prop->getName()}();
 			if (!is_scalar($new_ins->{$prop->getName()}))
 			{
-				$parsed_obj = RestControllerTrait::serialize($new_ins->{$prop->getName()});
+				$parsed_obj = array();
+				if (is_iterable($new_ins->{$prop->getName()}))
+					foreach($new_ins->{$prop->getName()} as $a_ins)
+						$parsed_obj[] = RestControllerTrait::serialize($a_ins);
+				else $parsed_obj = RestControllerTrait::serialize($new_ins->{$prop->getName()});
+
 				if ($parsed_obj) $new_ins->{$prop->getName()} = $parsed_obj;
 				else unset($new_ins->{$prop->getName()} );
 			}

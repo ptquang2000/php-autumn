@@ -35,47 +35,33 @@ class Repository
 
   public function save($entity)
   {
-    if (get_class($entity) != $this->entity_name) return null;
+    if (get_class($entity) != $this->_info['class']) return null;
 
-    $fields = array();
-    $id_col = array();
+    $id_col = [
+      $this->_info['id']['column'] 
+        => $entity->{'get_'.$this->_info['id']['name']} ?? null
+    ];
 
-    foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
-    {
-      $ref = $property->getAttributes()[0];
-      try
-      {
-        if ($ref->getName() == 'Core\ID')
-          $id_col[$ref->getArguments()['name']] = $entity->{'get_'.$property->name}();
+    $fields = array_combine(
+      array_map(function($item){
+        return $item['column'];
+      }, $this->_info['props']),
+      array_map(function($item) use($entity){
+        return $entity->{'get_'.$item['name']}();
+      }, $this->_info['props'])
+    );
 
-        else if ($ref->getName() == 'Core\Column')
-          $fields[$ref->getArguments()['name']] = $entity->{'get_'.$property->name}();
-
-        else if ($ref->getName() == 'Core\ManyToOne')
-          # Get relative info;
-          foreach((new ReflectionClass($property->getType()->getName()))->getProperties() as $r_property)
-            if ($r_property->getAttributes()[0]->getName() == 'Core\ID')
-              $fields[$ref->getArguments()['name']] = $entity->{'get_'.$property->getName()}()
-                ->{'get_'.$r_property->getName()}();
-      }
-      catch (Error $error)
-      {
-        if ($ref->getName() == 'Core\ID')
-          $id_col[$ref->getArguments()['name']] = 0;
-      }
-    }
-    if ($id_col[array_key_first($id_col)] != 0)
-      $this->db->table($this->entity_table)->update(array_merge($fields, $id_col));
+    if ($id_col[array_key_first($id_col)])
+      $this->db->table($this->_info['table'])->update(array_merge($fields, $id_col));
     else 
-      $id_col[array_key_first($id_col)] = $this->db->table($this->entity_table)->insert($fields);
+      $id_col[array_key_first($id_col)] = $this->db->table($this->_info['table'])->insert($fields);
 
-    $obj = $this->db->table($this->entity_table)->select_by_id($id_col);
-
+    $obj = $this->db->table($this->_info['table'])->select_by_id($id_col);
     # insert enity including id fields if an entity had the id which didn't exist in db
     if (!$obj) 
-      $id_col[array_key_first($id_col)] = $this->db->table($this->entity_table)->insert(array_merge($fields, $id_col));
+      $id_col[array_key_first($id_col)] = $this->db->table($this->_info['table'])->insert(array_merge($fields, $id_col));
 
-    return $this->instantiate($this->db->table($this->entity_table)->select_by_id($id_col));
+    return $this->instantiate($this->db->table($this->_info['table'])->select_by_id($id_col));
   }
 
   public function delete($entity)
@@ -170,7 +156,7 @@ class Repository
 
   public function find_by_props($fields, $cond=[null, '=']) {
     $objs = array();
-    foreach($this->db->table($this->entity_table)->select_by_fields($fields, $cond) as $obj)
+    foreach($this->db->table($this->_info['table'])->select_by_fields($fields, $cond) as $obj)
       $objs[] = $this->instantiate($obj);
     return $objs;
 

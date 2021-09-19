@@ -3,7 +3,7 @@
 namespace App\PHP;
 
 
-use Core\{Table, ID, Column};
+use Core\{Table, ID, Column, OneToMany};
 
 #[Table(name: 'course')]
 class Course

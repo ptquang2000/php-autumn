@@ -131,7 +131,7 @@ trait RestControllerTrait
 			$reflection_prop->setAccessible(true);
 			$class_name = $prop->getType()->getName();
 			
-			$reflection_prop->setValue($this, $this->autowired($class_name));
+			$reflection_prop->setValue($this, ($o=$this->autowired($class_name)));
 		}
 	}
 }

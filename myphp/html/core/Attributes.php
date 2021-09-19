@@ -42,8 +42,13 @@ class RestController {}
 #[Attribute(Attribute::TARGET_ALL)]
 class ManyToOne
 {
-  public function __construct(public $name, public $ref_col_name) {}
+  public function __construct(public $name, public $map_by) {}
 }
+// #[Attribute(Attribute::TARGET_ALL)]
+// class ManyToOne
+// {
+//   public function __construct(public $name, public $ref_col_name) {}
+// }
 #[Attribute(Attribute::TARGET_ALL)]
 class OneToMany
 {

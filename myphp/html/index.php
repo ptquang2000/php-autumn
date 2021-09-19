@@ -23,6 +23,8 @@ $url = $_SERVER['REQUEST_URI'];
 $url = preg_replace('/(\\/?\?.*)/', '', $url);
 
 use Core\Router;
-Router::setup();
+$df_app = glob("app/php/*.php");
+foreach ($df_app as $filename) 
+  Router::setup($filename);
 Router::route($url);
 ?>

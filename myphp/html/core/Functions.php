@@ -1,5 +1,7 @@
 <?php
 
+use Core\{OneToMany};
+
 function dnd($data)
 {
   echo '<pre>';
@@ -49,16 +51,19 @@ function setup_reflection($name)
         'column' => $attr[0]->getArguments()['name'],
         'name' => $prop->getName()
       ];
-    else if (str_contains($name, 'App\PHP') && $attr[0]->getName() == 'Core\ManyToOne')
-      $info['n-1'][] = [
+    else if ($attr[0]->getName() == 'Core\ManyToOne')
+    {
+      $mapby = setup_reflection($attr[0]->getArguments()['map_by']);
+      $info['n-1'][$mapby['class']] = [
         'column' => $attr[0]->getArguments()['name'],
-        'mapby' => setup_reflection($attr[0]->getArguments()['map_by']),
+        'mapby' => $mapby,
         'name' => $prop->getName()
       ];
+    }
     else if (str_contains($name, 'App\PHP') && $attr[0]->getName() == 'Core\OneToMany')
       $info['1-n'][] = [
         'mapby' => setup_reflection($attr[0]->getArguments()['map_by']),
-        'cascade' => $attr[0]->getArguments()['cascade'],
+        'cascade' => $attr[0]->getArguments()['cascade'] ?? OneToMany::DELETE,
         'name' => $prop->getName()
       ];
   }

@@ -156,30 +156,20 @@ class Repository
   public function find_all()
   {
     $objs = array();
-    foreach($this->db->table($this->entity_table)->select_all() as $obj)
+    foreach($this->db->table($this->_info['table'])->select_all() as $obj)
       $objs[] = $this->instantiate($obj);
     return $objs;
   }
 
   public function find_by_id($id)
   {
-    $id_col = array();
-    foreach((new ReflectionClass($this->entity_name))->getProperties() as $property)
-    {
-      $attribute = $property->getAttributes()[0];
-      if ($attribute->getName() == 'Core\ID')
-      {
-        $id_col[$attribute->getArguments()['name']] = $id;
-        break;
-      }
-    }
-    $obj = $this->db->table($this->entity_table)->select_by_id($id_col);
+    $id_col = [$this->_info['id']['column']=>$id];
+    $obj = $this->db->table($this->_info['table'])->select_by_id($id_col);
     return $obj ? $this->instantiate($obj) : $obj;
   }
 
   public function find_by_props($fields, $cond=[null, '=']) {
     $objs = array();
-
     foreach($this->db->table($this->entity_table)->select_by_fields($fields, $cond) as $obj)
       $objs[] = $this->instantiate($obj);
     return $objs;
@@ -229,13 +219,11 @@ class Repository
     {
       $r_entities = $this->db->table($prop['mapby']['table'])
         ->select_by_fields([
-          $prop['mapby']['id']['column'] => $obj->{$prop['id']['name']}
-      ]);
-      $entity->{'set_'.$prop['name']}(array_walk(
-        $r_entities,
-        [$this, 'instantiate'],
-        $prop['mapby']
-      ));
+          $prop['mapby']['n-1'][$info['class']]['column'] => $obj->{$info['id']['name']}
+      ], [null, '=']);
+      foreach($r_entities as $key=>$value)
+        $r_entities[$key] = $this->instantiate($value, $prop['mapby']);
+      $entity->{'set_'.$prop['name']}($r_entities);
     }
     return $entity;
   }

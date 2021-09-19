@@ -15,6 +15,8 @@ class Student
   private $year;
   #[Column(name:'name')]
   private $name;
+  #[Column(name:'course_id')]
+  private $course_id;
   #[ManyToOne(name:'course_id', map_by:'Course')]
   private $course;
 
@@ -29,6 +31,10 @@ class Student
   public function get_name()
   {
     return $this->name;
+  }
+  public function get_course_id()
+  {
+    return $this->course_id;
   }
   public function get_course()
   {
@@ -45,6 +51,10 @@ class Student
   public function set_name($name)
   {
     $this->name = $name;
+  }
+  public function set_course_id($course_id)
+  {
+    $this->course_id = $course_id;
   }
   public function set_course($course)
   {

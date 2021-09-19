@@ -22,14 +22,24 @@ class StudentService
     return $this->test_repository->find_by_id($id);
   }
 
-  public function test_get_by_prop_name()
+  public function test_get_by_prop_name($name)
   {
     return $this->test_repository->find_by_name($name);
   }
 
-  public function get_by_prop_year()
+  public function test_get_by_prop_year($year)
   {
     return $this->test_repository->find_by_year($year);
+  }
+  
+  public function test_get_by_prop_course_id($id)
+  {
+    return $this->test_repository->find_by_course_id($id);
+  }
+
+  public function test_get_by_props($id, $course_id)
+  {
+    return $this->test_repository->find_by_name_and_course_id($id, $course_id);
   }
 
   public function test_count()
@@ -42,9 +52,9 @@ class StudentService
 
   }
 
-  public function test_save()
+  public function test_save($student)
   {
-
+    return $this->test_repository->save($student);
   }
 }
 

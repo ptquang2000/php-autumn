@@ -15,13 +15,11 @@ class Repository
     $interface = (new ReflectionClass($this))->getInterfaceNames()[0];
     $this->_info = setup_reflection($interface);
 
-    $config = parse_ini_file('config.ini');
-
     $this->db = new Database(
-      $config['sql.url'], 
-      $config['sql.username'], 
-      $config['sql.password'], 
-      $config['sql.database']);
+      $GLOBALS['config']['sql.url'], 
+      $GLOBALS['config']['sql.username'], 
+      $GLOBALS['config']['sql.password'], 
+      $GLOBALS['config']['sql.database']);
   }
 
   public function save($entity)

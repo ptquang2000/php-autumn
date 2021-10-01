@@ -27,12 +27,12 @@ class Query
     if (!$fields) throw new mysqli_sql_exception('Fields in where clause cannot be empty');
     # Sql query
     $query = 'SELECT * FROM ' . $this->table . ' WHERE ';
-    $query .= implode($cond[1] .'? ' . $cond[0] . ' ',array_keys($fields)) . $cond[1].'?';
+    $query .= implode($cond[1] .' ? ' . $cond[0] . ' ',array_keys($fields)) . $cond[1].' ?';
 
     # Prepare statement
     $stmt = $this->conn->prepare($query);
     $type = array_map(function($e){
-      return gettype($e)[0];
+      return $e ? gettype($e)[0] : 'b';
     }, $fields);
     $stmt->bind_param(implode('', $type), ...array_values($fields));
     $stmt->execute();
@@ -71,7 +71,7 @@ class Query
 
     # Prepare statement 
     $stmt = $this->conn->prepare($query);
-    $type = gettype($id[array_key_first($id)])[0];
+    $type = $id[array_key_first($id)] ? gettype($id[array_key_first($id)])[0] : 'b';
 
     $stmt->bind_param($type, $id[array_key_first($id)]);
     $stmt->execute();

@@ -5,19 +5,6 @@ namespace Core;
 use ReflectionClass;
 use ErrorException;
 
-define ('FIND_BY', [
-  'and'=> ['and', '='],
-  'is'=> ['and', '='],
-  'equal'=> ['and', '='],
-  'or' => ['or', '='],
-  'lessthan' => ['or', '<'],
-  'lessthanequal' => ['or', '<='],
-  'greaterthan' => ['or', '>'],
-  'greaterthanequal' => ['or', '>='],
-  'like' => ['or', 'like'],
-  'notlike' => ['or', 'not like'],
-]);
-
 trait RestControllerTrait
 {
 	public static function serialize($obj){
@@ -83,6 +70,8 @@ trait RestControllerTrait
 				{
 					$cond = implode("','",FIND_BY[$kw[array_key_first($kw)]]);
 					$cols = explode('_'.$kw[array_key_first($kw)].'_', $method);
+					if (count($cols) == 1)
+						$cols = [explode('_', $method)[0]];
 					$args = '$' . implode(', $', $cols);
 					$fields = implode(', ', array_map(function($e){
 						return "'$e'" . '=> $' .$e;

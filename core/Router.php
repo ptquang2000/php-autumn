@@ -16,9 +16,10 @@ class Router
 	private static $url;
 	public static $paths = array();
 	private static $controller;
-	private static $path;
+	public static $path;
 	private static $df_parts=array();
 	private static $type;
+	private static $security;
 
 	public static function setup($filename)
 	{
@@ -26,6 +27,15 @@ class Router
 		str_replace('.php', '', $filename));
 		$reflection = new ReflectionClass($class);
 		$attributes = $reflection->getAttributes();
+
+		if (!interface_exists($class) && 
+		isset($reflection->getInterfaceNames()[0]) &&
+		$reflection->getInterfaceNames()[0] == 'Core\UserDetailsService')
+		{
+			Router::$security = new SecurityConfiguration();
+			Router::$security->set_userdetails_service($reflection->newInstance());
+		}
+
 		if (!$attributes || ($attributes[0]->getName() != 'Core\Controller'
 		&&  $attributes[0]->getName() != 'Core\RestController')) return;
 
@@ -79,7 +89,12 @@ class Router
 					'"\'s method "'.
 					Router::$paths[$attr_args['value']]['class_method'].
 					'"');
-
+			
+			if (isset($method->getAttributes()[1]))
+			{
+				SecurityConfiguration::$paths[$attr_args['value']] = $method->getAttributes()[1]->getArguments()['role'];
+			}
+			
 			Router::$paths[$attr_args['value']] = [
 				'method'=> $attr_args['method'] ?? RequestMethod::GET,
 				'class' => $class,
@@ -114,6 +129,11 @@ class Router
 	public static function route($url)
 	{
 		Router::$url = $url;
+		if (isset(router::$security) && 
+		$_SERVER['REQUEST_METHOD'] === RequestMethod::POST &&
+		$url == ($GLOBALS['config']['security.login_processing'] ?? '/login'))
+			Router::$security->authenticate();
+
 		if (pathinfo($url, PATHINFO_EXTENSION))
 		{
 			$url = str_replace('/', DL, $url);
@@ -178,6 +198,9 @@ class Router
 				[$object]);
 		}
 		// call url handle
+		if (!Router::$security->authorize(Router::$path))
+			# raise 403;	
+			return;
 		$result = Router::$controller->{Router::$paths[Router::$path]['class_method']}
 			(...Router::$df_parts);
 		if ($type == 'Core\RestControllerTrait')

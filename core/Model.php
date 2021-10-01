@@ -10,7 +10,10 @@ class Model
   {
     $this->attributes[$name]=$instance;
   }
-  
+  public function attribute($name)
+  {
+    return $this->attributes[$name];
+  } 
   public function get_attribute($name, $attr=null)
   {
     if (!$attr) $attr=$this->attributes;

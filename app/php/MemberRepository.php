@@ -4,10 +4,10 @@ namespace App\PHP;
 use Core\{IRepository, Entity};
 
 
-#[Entity(class:'member')]
+#[Entity(class:'Member')]
 interface MemberRepository extends IRepository
 {
-  public function find_by_username($username);
+  public function find_by_uid($uid);
 }
 
 ?>

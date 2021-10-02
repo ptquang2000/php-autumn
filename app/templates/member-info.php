@@ -1,14 +1,19 @@
 Member Info
 <br>
-<?php
-
-echo '<h4>mid: '.$model->attribute('member')->get_mid().'</h4>';
-echo '<h4>uid: '.$model->attribute('member')->get_username().'</h4>';
-echo '<h4>name: '.$model->attribute('member')->get_name().'</h4>';
-echo '<h4>email: '.$model->attribute('member')->get_email().'</h4>';
-echo '<h4>phone: '.$model->attribute('member')->get_phone().'</h4>';
-echo '<h4>address: '.$model->attribute('member')->get_address().'</h4>';
-echo '<h4>birth: '.$model->attribute('member')->get_birth().'</h4>';
-echo '<h4>img: '.$model->attribute('member')->get_img().'</h4>';
-
-?>
+<form action="/save-info" method="POST">
+<input type="text" name='mid' value="<?= $member['mid']?>">
+<br>
+<input type="text" name='username' value="<?= $member['username']?>">
+<br>
+<input type="text" name='email' value="<?= $member['email']?>">
+<br>
+<input type="text" name="phone" value="<?= $member['phone']?>">
+<br>
+<input type="text" name="address" value="<?= $member['address']?>">
+<br>
+<input type="text" name="birth" value="<?= $member['birth']?>">
+<br>
+<input type="text" name="img" value="<?= $member['img']?>">
+<br>
+<input type="submit" value="save">
+</form>

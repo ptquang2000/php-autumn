@@ -1,7 +1,7 @@
 <?php
 
 namespace App\PHP;
-use Core\UserDetails;
+use Core\{UserDetails, Service};
 
 #[Service]
 class MyUserDetails implements UserDetails
@@ -12,7 +12,10 @@ class MyUserDetails implements UserDetails
   {
     $this->user = $user;
   }
-
+  public function get_uid()
+  {
+    return $this->user->get_uid();
+  }
   public function get_authority()
   {
     return explode('_', $this->user->get_role())[1];

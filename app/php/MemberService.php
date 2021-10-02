@@ -20,9 +20,9 @@ class MemberService
     return $this->member_repository->find_by_id($id);
   }
 
-  public function get_member_by_username($username)
+  public function get_member_by_uid($uid)
   {
-    return $this->member_repository->find_by_username($username);
+    return $this->member_repository->find_by_uid($uid);
   }
 
   public function delete_member(Member $member)

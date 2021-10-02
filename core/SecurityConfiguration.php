@@ -41,6 +41,7 @@ class SecurityConfiguration
       $_SESSION['LOGIN-ERROR'] = $e->getMessage();
       header('Location: '.$GLOBALS['config']['security.login'] ?? '/login');
     }
+    exit();
   }
 
   public function authorize($path)
@@ -77,6 +78,7 @@ class SecurityConfiguration
     }
     $_SESSION['CURRENT_URL'] = Router::$url;
     header('Location: '.$GLOBALS['config']['security.login'] ?? '/login');
+    exit();
   }
 }
 

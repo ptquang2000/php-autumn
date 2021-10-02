@@ -42,7 +42,8 @@ class Router
 		$methods = $reflection->getMethods();
 		foreach($methods as $method)
 		{
-			if ($method->getAttributes()[0]->getName() != 'Core\RequestMapping')
+			if (!$method->getAttributes() || 
+			$method->getAttributes()[0]->getName() != 'Core\RequestMapping')
 				continue;
 			
 			$method_attr = $method->getAttributes()[0];

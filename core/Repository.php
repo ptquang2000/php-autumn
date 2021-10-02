@@ -2,8 +2,6 @@
 namespace Core;
 
 use Core\Database;
-use Error;
-use ReflectionClass;
 
 class Repository 
 {
@@ -12,7 +10,7 @@ class Repository
 
   public function __construct()
   {
-    $interface = (new ReflectionClass($this))->getInterfaceNames()[0];
+    $interface = (new \ReflectionClass($this))->getInterfaceNames()[0];
     $this->_info = setup_reflection($interface);
 
     $this->db = new Database(
@@ -89,7 +87,7 @@ class Repository
       $this->db->table($this->_info['table'])->delete($id_col);
       $this->db->get_conn()->commit();
     }
-    catch (mysqli_sql_exception $exception)
+    catch (\mysqli_sql_exception $exception)
     {
       $this->db->get_conn()->rollback(); 
       throw $exception;
@@ -146,6 +144,19 @@ class Repository
     }
     // set n-1 reletionship
     foreach ($info['n-1'] as $prop)
+    {
+      $fk_id = $obj->{$prop['column']};
+      if (!$fk_id) continue;
+      $entity->{'set_'.$prop['name']}($this->instantiate(
+        $this->db->table($prop['mapby']['table'])
+        ->select_by_id([
+              $prop['mapby']['id']['column'] => $fk_id
+            ]),
+        $prop['mapby']
+      ));
+    }
+    // set 1-1 reletionship
+    foreach ($info['1-1'] as $prop)
     {
       $fk_id = $obj->{$prop['column']};
       if (!$fk_id) continue;

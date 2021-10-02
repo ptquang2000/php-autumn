@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 include_once 'core\\Attributes.php';
 include_once 'core\\Functions.php';
 include_once 'core\\Define.php';
@@ -15,6 +13,7 @@ spl_autoload_register(function($class)
   if (file_exists($path))
     include_once $path;
 });
+session_start();
 
 // configuration
 $config = parse_ini_file('config.ini');

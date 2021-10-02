@@ -13,10 +13,10 @@ function Error404($url='', $method=''){
 
 class Router
 {
-	private static $url;
+	public static $url;
+	public static $path;
 	public static $paths = array();
 	private static $controller;
-	public static $path;
 	private static $df_parts=array();
 	private static $type;
 	private static $security;

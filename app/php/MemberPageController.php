@@ -14,9 +14,12 @@ class MemberPageController
   private FavouriteService $favourite_service; 
 
   #[RequestMapping(value: '/member-info', method: RequestMethod::GET)]
-  #[EnableSecurity(role: ['MEMBER', 'ADMIN'])]
-  function get_main(Model $model)
+  #[EnableSecurity(role: ['MEMBER'])]
+  function get_member_info(Model $model)
   {
+    $user = $_SESSION['USER'];
+    $member = $this->member_service->get_member_by_username($user->get_username())[0];
+    $model->add_attribute('member', $member);
     include __TEMPLATE__.'member-info.php';
   }
   #[RequestMapping(value: '/save-info', method: RequestMethod::POST)]

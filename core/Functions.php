@@ -1,6 +1,6 @@
 <?php
 
-use Core\{OneToMany};
+use Core\{OneToMany, Router};
 
 function dnd($data)
 {
@@ -14,6 +14,15 @@ function pr($data)
   echo '<pre>';
   var_dump($data);
   echo '</pre>';
+}
+
+function form_model($model)
+{
+  $reflection = new \ReflectionClass(__APP__.$model);	
+  $object = $reflection->newInstance();
+  foreach($reflection->getProperties() as $prop)
+    $object->{'set_'.$prop->getName()}(htmlspecialchars($_REQUEST[$prop->getName()] ?? null));
+  return $object;
 }
 
 function autowired($class)
@@ -142,6 +151,15 @@ function setup_reflection($name)
     {
       $mapby = setup_reflection($attr[0]->getArguments()['map_by']);
       $info['n-1'][$mapby['class']] = [
+        'column' => $attr[0]->getArguments()['name'],
+        'mapby' => $mapby,
+        'name' => $prop->getName()
+      ];
+    }
+    else if ($attr[0]->getName() == 'Core\OneToOne')
+    {
+      $mapby = setup_reflection($attr[0]->getArguments()['map_by']);
+      $info['1-1'][$mapby['class']] = [
         'column' => $attr[0]->getArguments()['name'],
         'mapby' => $mapby,
         'name' => $prop->getName()

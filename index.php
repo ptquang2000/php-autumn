@@ -14,6 +14,7 @@ spl_autoload_register(function($class)
     include_once $path;
 });
 session_start();
+clearstatcache();
 
 // configuration
 $config = parse_ini_file('config.ini');
@@ -21,6 +22,7 @@ $config = parse_ini_file('config.ini');
 // Routing
 $url = $_SERVER['REQUEST_URI'];
 $url = preg_replace('/(\\/?\?.*)/', '', $url);
+$url = strlen($url) != 1 ? rtrim($url, '/') : $url;
 
 use Core\Router;
 

@@ -6,6 +6,7 @@ namespace Core;
 define("DL", "\\");
 define('__STATIC__', 'app'.DL.'static'.DL);
 define('__TEMPLATE__', 'app'.DL.'templates'.DL);
+define('__IMAGE__', __TEMPLATE__.'img'.DL);
 define('__APP__', 'app'.DL.'PHP'.DL);
 # render html tag
 define('XPATH_NODE', '//*[@*[contains(name(), "bk:")]]');

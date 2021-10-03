@@ -7,10 +7,6 @@ use ReflectionClass;
 use Exception;
 use Core\RequestMethod;
 
-function Error404($url='', $method=''){
-	return "Error404: Path $url does not exist";
-};
-
 class Router
 {
 	public static $url;
@@ -130,10 +126,16 @@ class Router
 	public static function route($url)
 	{
 		Router::$url = $url;
+
+		// security filter
 		if (isset(router::$security) && 
 		$_SERVER['REQUEST_METHOD'] === RequestMethod::POST &&
 		$url == ($GLOBALS['config']['security.login_processing'] ?? '/login'))
 			Router::$security->authenticate();
+		if (isset(router::$security) && 
+		$_SERVER['REQUEST_METHOD'] === RequestMethod::POST &&
+		$url == ($GLOBALS['config']['security.logout_processing'] ?? '/logout'))
+			Router::$security->logout();
 
 		if (pathinfo($url, PATHINFO_EXTENSION))
 		{
@@ -145,7 +147,7 @@ class Router
 		if (array_key_exists(Router::$url, Router::$paths))
 		{
 			if ($_SERVER['REQUEST_METHOD'] !== Router::$paths[$url]['method'])
-				throw new Exception (Error404($url));
+				throw new HttpException('404');
 
 			Router::$path = $url;
 			$class = Router::$paths[$url]['class'];
@@ -165,7 +167,7 @@ class Router
 			|| $_SERVER['REQUEST_METHOD'] !== Router::$paths[$path]['method']) 
 			{
 				if ($path === array_key_last(Router::$paths))
-					throw new Exception (Error404($url));
+					throw new HttpException('404');
 				continue;
 			}
 			Router::$path = $path;
@@ -185,7 +187,7 @@ class Router
 		if (isset(Router::$paths[Router::$path]['model']))
 			array_splice(Router::$df_parts, 
 				Router::$paths[Router::$path]['model'], 0, 
-				[$controller->init_model()]);
+				[$controller->get_model()]);
 		// set model for method
 		if (array_key_exists('object', Router::$paths[Router::$path]))
 		{
@@ -199,15 +201,14 @@ class Router
 				[$object]);
 		}
 		// call url handle
-		if (!Router::$security->authorize(Router::$path))
-			# raise 403;	
-			return;
+		if (isset(Router::$security)) Router::$security->authorize(Router::$path);
+
 		$result = Router::$controller->{Router::$paths[Router::$path]['class_method']}
 			(...Router::$df_parts);
 		if ($type == 'Core\RestControllerTrait')
 			RestControllerTrait::encode($result);
 		else if ($type == 'Core\ControllerTrait')
-			Router::$controller->render($result);	
+			Router::$controller->init_view($result)->render();	
 	}
 }
 	

@@ -23,6 +23,15 @@ class SecurityConfiguration
 		}
     $this->userdetails_service = $userdetails_service;
   }
+  
+  public function logout()
+  {
+    unset($_SESSION['USER']);
+    $_SESSION['LOGIN-ERROR'] = 'Logout';
+    $url = $GLOBALS['config']['security.logout_redirect'] ?? $_SERVER['HTTP_REFERER'] ?? '/';
+    header('Location: '.$url);
+    exit();
+  }
 
   public function authenticate()
   {
@@ -33,7 +42,7 @@ class SecurityConfiguration
     if (!password_verify($password, $user->get_password()))
       throw new UserDetailsException('WrongPassword');
     $_SESSION['USER'] = $user;
-    $url = $_SESSION['CURRENT_URL'];
+    $url = $_SESSION['CURRENT_URL'] ?? $GLOBALS['config']['view.login_success'] ?? '/'; 
     header('Location: '.$url);
     }catch (UserDetailsException $e)
     {
@@ -47,7 +56,15 @@ class SecurityConfiguration
   public function authorize($path)
   {
     if (!array_key_exists($path, SecurityConfiguration::$paths))
+    {
+      if (isset($_SESSION['USER']) && $path == $GLOBALS['config']['security.login'] ?? '/login')
+      {
+        $url = $_SERVER['HTTP_REFERER'] ?? $GLOBALS['config']['view.login_success'] ?? '/'; 
+        header('Location: '.$url);
+        exit();
+      }
       return true;
+    }
     if (isset($_SESSION['USER']))
     {
       try
@@ -57,7 +74,7 @@ class SecurityConfiguration
         {
           $roles = SecurityConfiguration::$paths[$path];
           if(!in_array($user->get_authority(), $roles))
-            throw new UserDetailsException('DontHavePermission');
+            throw new HttpException('403');
         }
         if (!$user->is_account_expired())
           throw new UserDetailsException('AccountExpired');
@@ -73,7 +90,7 @@ class SecurityConfiguration
         header('Location: '.$GLOBALS['config']['security.login'] ?? '/login');
         exit();
       }
-      unset($_SESSION['CURRENT_URL']);
+      unset($_SESSION['LOGIN-ERROR']);
       return true;
     }
     $_SESSION['CURRENT_URL'] = Router::$url;

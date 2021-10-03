@@ -25,6 +25,11 @@ class FavouriteService
     return $this->favourite_repository->find_by_mid($mid);
   }
 
+  public function get_favourite_by_bid($mid)
+  {
+    return $this->favourite_repository->find_by_bid($mid);
+  }
+
   public function delete_favourite($id)
   {
     return $this->favourite_repository->delete($id);

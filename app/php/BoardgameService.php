@@ -41,7 +41,7 @@ class BoardgameService
         });
     if (isset($price))
       uasort($boardgames, 
-        function($a, $b) use ($aplh)
+        function($a, $b) use ($price)
         {
           if ($a->get_price() == $b->get_price()) return 0;
           if ($price == 'asc')
@@ -68,7 +68,7 @@ class BoardgameService
 
   public function save_boardgame(Boardgame $boardgame)
   {
-    return $this->boardgame_repository->save($course);
+    return $this->boardgame_repository->save($boardgame);
   }
 }
 

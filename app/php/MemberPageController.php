@@ -15,62 +15,86 @@ class MemberPageController
 
   #[RequestMapping(value: '/member-info', method: RequestMethod::GET)]
   #[EnableSecurity(role: ['MEMBER'])]
-  function get_member_info()
+  function get_member_info(Model $model)
   {
     $user = $_SESSION['USER'];
     $member = $this->member_service->get_member_by_uid($user->get_uid())[0];
     $member = [
-      'mid' => $member->get_mid(),
-      'username' => $user->get_username(),
+      'name' => $member->get_name(),
       'email' => $member->get_email(),
       'phone' => $member->get_phone(),
       'address' => $member->get_address(),
       'birth' => $member->get_birth(),
       'img' => $member->get_img()
     ];
-    include __TEMPLATE__.'member-info.php';
+    $model->add_attribute('member', $member);
+    return 'member-info.php';
   }
+
   #[RequestMapping(value: '/save-info', method: RequestMethod::POST)]
   #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
   function post_save_info()
   {
     $member = form_model('Member');
-    $member = $this->member_service->save_member($member);
-    if ($member->get_user()->get_role() == 'ROLE_ADMIN')
+    if ($_SESSION['USER']->get_authority() == 'MEMBER')
     {
-      header('Location: /member-info/'.$member->get_mid());
-      exit();
+      $uid = $_SESSION['USER']->get_uid();
+      $mid = $this->member_service->get_member_by_uid($uid)[0]->get_mid();
+      $member->set_uid($uid);
+      $member->set_mid($mid);
     }
-    header('Location: /member-info');
-    exit();
+
+    if (is_uploaded_file($_FILES['image-file']['tmp_name']) &&
+    getimagesize($_FILES['image-file']['tmp_name']))
+    {
+      if (file_exists(__IMAGE__.$member->get_img()))
+        unlink(__IMAGE__.$member->get_img());
+      $file_type = '.'.pathinfo($_FILES['image-file']['name'], PATHINFO_EXTENSION);
+      $file_name = $member->get_mid().$file_type;
+      move_uploaded_file($_FILES['image-file']['tmp_name'], __IMAGE__.$file_name);
+      $member->set_img($file_name);
+    }
+
+    // save member and redirect
+    $member = $this->member_service->save_member($member);
+    if ($_SESSION['USER']->get_authority() == 'ADMIN')
+      return 'Location: /member-info/'.$member->get_mid();
+    return 'Location: /member-info';
   }
+
   #[RequestMapping(value: '/add-favourite', method: RequestMethod::POST)]
   #[EnableSecurity(role:['MEMBER'])]
   function post_add_favourite()
   {
     $new_favourite = form_model('Favourite');
-    $new_favourite = $this->favourite_service->save_favourite($new_favourite);
-    header('Location: /product-detail?id='.$new_favourite->get_bid());
-    exit();
+    $member = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0];
+    if ($member->get_mid() == $new_favourite->get_mid())
+      $new_favourite = $this->favourite_service->save_favourite($new_favourite);
+    return 'Location: /product-detail?id='.$new_favourite->get_bid();
   }
+
   #[RequestMapping(value: '/delete-favourite', method: RequestMethod::POST)]
   #[EnableSecurity(role:['MEMBER'])]
   function post_delete_favourite()
   {
     $deleted_favourite = form_model('Favourite');
-    $bid = $deleted_favourite->get_bid();
-    $this->favourite_service->delete_favourite($deleted_favourite);
-    header('Location: /product-detail?id='.$bid);
-    exit();
+    $member = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0];
+    if ($member->get_mid() == $deleted_favourite->get_mid())
+    {
+      $bid = $deleted_favourite->get_bid();
+      $this->favourite_service->delete_favourite($deleted_favourite);
+      return 'Location: /product-detail?id='.$bid;
+    }
+    return 'Location: /product-list';
   }
+
   #[RequestMapping(value: '/add-comment', method: RequestMethod::POST)]
   #[EnableSecurity(role:['MEMBER'])]
   function post_save_comment()
   {
     $new_comment = form_model('Comment');
     $new_comment = $this->comment_service->save_comment($new_comment);
-    header('Location: /product-detail?id='.$new_comment->get_bid());
-    exit();
+    return 'Location: /product-detail?id='.$new_comment->get_bid();
   }
 }
 

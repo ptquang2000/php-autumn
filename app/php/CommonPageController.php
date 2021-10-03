@@ -1,7 +1,7 @@
 <?php
 
 namespace App\PHP;
-use Core\{Controller, RequestMapping, RequestMethod, Autowired, Model};
+use Core\{Controller, RequestMapping, RequestMethod, Autowired, HttpException, Model};
 
 #[Controller]
 class CommonPageController
@@ -38,23 +38,35 @@ class CommonPageController
       'boardgames', 
       $this->boardgame_service->get_all_boardgames($alph, $price, $level)
       );
-    include __TEMPLATE__.'product-list.php';
+    return 'product-list.php';
   }
 
   #[RequestMapping(value: '/product-detail', method: RequestMethod::GET)]
-  function get_product_detail()
+  function get_product_detail(Model $model)
   {
     if (!isset($_GET['id'])) 
-      # raise exception 404
-      return; 
+      throw new HttpException('404');
+
     $id = $_GET['id'];
     $boardgame = $this->boardgame_service->get_boardgame($id);
+    if (!isset($boardgame))
+      throw new HttpException('404');
+
+    $model->add_attribute('boardgame', $boardgame);
+
     $comments = $this->comment_service->get_comment_by_bid($id);
     $comments = array_map([$this, 'match_member_comment'], $comments);
-    $mid = $this->member_service->get_member_by_uid(
-      $_SESSION['USER']->get_uid())[0]->get_mid();
-    $fid = $this->favourite_service->get_favourite_by_mid($mid);
-    include __TEMPLATE__.'product-detail.php';
+    $model->add_attribute('comments', $comments);
+
+    if (isset($_SESSION['USER']))
+    {
+      $mid = $this->member_service->get_member_by_uid(
+        $_SESSION['USER']->get_uid())[0]->get_mid();
+      $model->add_attribute('mid', $mid);
+      $fid = $this->favourite_service->get_favourite_by_mid($mid);
+      $model->add_attribute('fid', $fid);
+    }
+    return 'product-detail.php';
   }
 
   private function match_member_comment($comment)
@@ -69,7 +81,7 @@ class CommonPageController
   #[RequestMapping(value: '/news', method: RequestMethod::GET)]
   function get_news()
   {
-    include __TEMPLATE__.'news.php';
+    return 'news.php';
   }
 }
 

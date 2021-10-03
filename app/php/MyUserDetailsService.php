@@ -17,6 +17,21 @@ class MyUserDetailsService implements UserDetailsService
       return new MyUserDetails($user[0]);
     throw new UserDetailsException('UserNotFound');
   }
+
+  public function save_user(User $user)
+  {
+    $user->set_role('ROLE_MEMBER');
+    $user->set_password(password_hash($user->get_password(), PASSWORD_DEFAULT));
+    return $this->user_repository->save($user);
+  }
+  public function save_password(User $user)
+  {
+    return $this->user_repository->save($user);
+  }
+  public function delete_user($id)
+  {
+    return $this->user_repository->delete($id);
+  }
 }
 
 ?>

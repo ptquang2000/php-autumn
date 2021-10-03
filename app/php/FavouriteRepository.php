@@ -8,6 +8,7 @@ use Core\{IRepository, Entity};
 interface FavouriteRepository extends IRepository
 {
   public function find_by_mid($id);
+  public function find_by_bid($id);
 }
 
 ?>

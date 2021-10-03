@@ -1,12 +1,8 @@
+<?php include __TEMPLATE__.'logout.php'?>
 Product List
 <br>
-<?php
-
-foreach($model->attribute('boardgames') as $boardgame)
-{
-  echo '<div id="'.$boardgame->get_bid().'">';
-  echo '<h4>name: ' . $boardgame->get_name() . '</h4>';
-  echo '</div>';
-}
-
-?>
+<?php foreach($boardgames as $boardgame): ?>
+  <div id="<?=$boardgame->get_bid()?>">
+  <h4>name: <?=$boardgame->get_name() ?> </h4>
+  </div>
+<?php endforeach?>

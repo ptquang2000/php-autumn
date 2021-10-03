@@ -28,6 +28,19 @@ class Member
   public function get_user(){return $this->user;}
   public function set_user($user){$this->user = $user;}
 
+  public static function Member($uid)
+  {
+    $member = new Member();
+    $member->set_uid($uid);
+    $member->set_name('');
+    $member->set_email('');
+    $member->set_phone('');
+    $member->set_address('');
+    $member->set_birth('');
+    $member->set_img('');
+    return $member;
+  }
+
   public function get_mid(){return $this->mid;}
   public function set_mid($mid){$this->mid = $mid;}
   public function get_uid(){return $this->uid;}

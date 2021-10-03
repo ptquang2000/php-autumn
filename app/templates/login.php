@@ -5,6 +5,4 @@ Password:<input type="password" id="password" name="password">
 <br>
 <input type="submit">
 </form>
-<?php
-echo $_SESSION['LOGIN-ERROR'] ?? null;
-?>
+<?= $_SESSION['LOGIN-ERROR'] ?? null?>

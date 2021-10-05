@@ -16,6 +16,41 @@ function pr($data)
   echo '</pre>';
 }
 
+function PIPHP_ImageResize($image, $w, $h)
+{
+  $oldw = imagesx($image);
+  $oldh = imagesy($image);
+  $temp = imagecreatetruecolor($w, $h);
+  imagecopyresampled($temp, $image, 0, 0, 0, 0, $w, $h, $oldw, $oldh);
+  return $temp;
+}
+
+function serialize_object($obj){
+  if (!$obj) return null;
+  if (is_array($obj))
+    return array_map(function($instance){
+      return serialize_object($instance);
+    }, $obj);
+  $props = (new ReflectionClass($obj))->getProperties();
+  $new_ins = new \stdClass();
+  foreach($props as $prop)
+  {
+    $new_ins->{$prop->getName()} = $obj->{'get_'.$prop->getName()}();
+    if (!is_scalar($new_ins->{$prop->getName()}))
+    {
+      $parsed_obj = array();
+      if (is_iterable($new_ins->{$prop->getName()}))
+        foreach($new_ins->{$prop->getName()} as $a_ins)
+          $parsed_obj[] = serialize_object($a_ins);
+      else $parsed_obj = serialize_object($new_ins->{$prop->getName()});
+
+      if ($parsed_obj) $new_ins->{$prop->getName()} = $parsed_obj;
+      else unset($new_ins->{$prop->getName()} );
+    }
+  }
+  return $new_ins;
+}
+
 function form_model($model)
 {
   $reflection = new \ReflectionClass(__APP__.$model);	

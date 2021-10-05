@@ -60,8 +60,15 @@ class SecurityConfiguration
       if (isset($_SESSION['USER']) && $path == $GLOBALS['config']['security.login'] ?? '/login')
       {
         $url = $_SERVER['HTTP_REFERER'] ?? $GLOBALS['config']['view.login_success'] ?? '/'; 
+        $url = $url == ($GLOBALS['config']['security.login'] ?? '/login') ? $url : '/';
         header('Location: '.$url);
         exit();
+      }
+      if (!isset($_SESSION['USER']))
+      {
+        if ($path == $GLOBALS['config']['security.login'] ?? '/login')
+          $_SESSION['CURRENT_URL'] = $_SESSION['HTTP_REFERER'] ?? $_SERVER['REQUEST_URI'];
+        else unset($_SESSION['LOGIN_ERROR']);
       }
       return true;
     }
@@ -91,6 +98,7 @@ class SecurityConfiguration
         exit();
       }
       unset($_SESSION['LOGIN-ERROR']);
+      unset($_SESSION['CURRENT_URL']);
       return true;
     }
     $_SESSION['CURRENT_URL'] = Router::$url;

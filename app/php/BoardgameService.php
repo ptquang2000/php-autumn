@@ -37,7 +37,9 @@ class BoardgameService
           if ($a->get_name() == $b->get_name()) return 0;
           if ($aplh == 'asc')
             return $a->get_name() < $b->get_name() ? -1 : 1;
-          return $a->get_name() < $b->get_name() ? 1 : -1;
+          if ($aplh == 'desc')
+            return $a->get_name() < $b->get_name() ? 1 : -1;
+          return 0;
         });
     if (isset($price))
       uasort($boardgames, 
@@ -46,9 +48,11 @@ class BoardgameService
           if ($a->get_price() == $b->get_price()) return 0;
           if ($price == 'asc')
             return $a->get_price() < $b->get_price() ? -1 : 1;
-          return $a->get_price() < $b->get_price() ? 1 : -1;
+          if ($price == 'desc')
+            return $a->get_price() < $b->get_price() ? 1 : -1;
+          return 0;
         });
-    return $boardgames;
+    return array_values($boardgames);
   }
 
   public function get_boardgame($id)

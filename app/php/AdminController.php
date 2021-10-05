@@ -2,6 +2,7 @@
 
 namespace App\PHP;
 use Core\{Controller, RequestMapping, RequestMethod, Model, Autowired, EnableSecurity, HttpException};
+use GdImage;
 
 #[Controller]
 class AdminController

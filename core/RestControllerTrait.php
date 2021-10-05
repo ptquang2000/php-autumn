@@ -7,37 +7,16 @@ use ErrorException;
 
 trait RestControllerTrait
 {
-	public static function serialize($obj){
-		if (!$obj) return null;
-		$props = (new ReflectionClass($obj))->getProperties();
-		$new_ins = new \stdClass();
-		foreach($props as $prop)
-		{
-			$new_ins->{$prop->getName()} = $obj->{'get_'.$prop->getName()}();
-			if (!is_scalar($new_ins->{$prop->getName()}))
-			{
-				$parsed_obj = array();
-				if (is_iterable($new_ins->{$prop->getName()}))
-					foreach($new_ins->{$prop->getName()} as $a_ins)
-						$parsed_obj[] = RestControllerTrait::serialize($a_ins);
-				else $parsed_obj = RestControllerTrait::serialize($new_ins->{$prop->getName()});
-
-				if ($parsed_obj) $new_ins->{$prop->getName()} = $parsed_obj;
-				else unset($new_ins->{$prop->getName()} );
-			}
-		}
-		return $new_ins;
-	}
 
 	public static function encode($result)
 	{
 		if (!$result) return;
-		if (is_iterable($result))
+		if (is_array($result))
 			echo '['.implode(',',array_map(function($instance){
-				return json_encode(RestControllerTrait::serialize($instance));
+				return serialize_object($instance);
 			}, $result)).']';
 		else
-			echo json_encode(RestControllerTrait::serialize($result));
+			echo serialize_object($result);
 	}
 
 	public function autowired($class)

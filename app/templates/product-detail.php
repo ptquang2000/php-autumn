@@ -1,99 +1,155 @@
-<?php include __TEMPLATE__.'logout.php'?>
-Product detail
-<br>
-<?php if (isset($_SESSION['USER']) && $_SESSION['USER']->get_authority() == 'ADMIN'): ?>
-  <form id="<?=$boardgame->get_bid();?>" method="POST" enctype="multipart/form-data">
-    bid<input type="text" name='bid' value="<?= $boardgame->get_bid();?>"  />
-    <br>
-    name<input type="text" name='name' value="<?= $boardgame->get_name();?>"  />
-    <br>
-    age_min<input type="text" name="age_min" value="<?= $boardgame->get_age_min();?>"  />
-    <br>
-    age_max<input type="text" name="age_max" value="<?= $boardgame->get_age_max();?>"  />
-    <br>
-    player_min<input type="text" name="player_min" value="<?=$boardgame->get_player_min();?>" />
-    <br>
-    player_max<input type="text" name="player_max" value="<?=$boardgame->get_player_max();?>" />
-    <br>
-    time_min<input type="text" name="time_min" value="<?= $boardgame->get_time_min()?>" />
-    <br>
-    time_max<input type="text" name="time_max" value="<?= $boardgame->get_time_max()?>" />
-    <br>
-    level<input type="text" name="level" value="<?= $boardgame->get_level();?>"  />
-    <br>
-    price<input type="text" name="price" value="<?= $boardgame->get_price();?>"  />
-    <br>
-    <img src="/img/<?=$boardgame->get_img()?>" width="10%">
-    <br>
-    img<input type="text" name="img" value="<?=$boardgame->get_img()?>">
-    <br>
-    file<input type="file" name="image-file">
-    <br>
-    <input type="submit" formaction="/edit-product" value="edit"/>
-    <input type="submit" formaction="/delete-product" value="delete"/>
-  </form>
-<?php else: ?>
-  <div id="<?=$boardgame->get_bid();?>">
-    <h4> name:<?= $boardgame->get_name();?> </h4>
-      <?php if ($boardgame->get_age_max() == 0): ?>
-        <h4>>=<?=$boardgame->get_age_min()?></h4>
-      <?php else: ?>
-        <h4><?=$boardgame->get_age_min().'-'.$boardgame->get_age_max()?></h4>
-      <?php endif; ?>
-    <h4> player:<?=$boardgame->get_player_min().'-'.$boardgame->get_player_max();?> </h4>
-    <h4> time:<?= $boardgame->get_time_min().'-'.$boardgame->get_time_max();?> </h4>
-    <h4> level:<?= $boardgame->get_level();?>  </h4>
-    <h4> price:<?= $boardgame->get_price();?>  </h4>
+<?php include __TEMPLATE__.'html\\head.html'?>
+<?php include __TEMPLATE__.'html\\navbar.php'?>
+
+<section id="main-container" class="m-5">
+  <!-- Admin -->
+  <div v-if="role=='ADMIN'" class="container-lg">
+    <form method="POST" enctype="multipart/form-data" class="form-inline row justify-content-center align-items-center">
+      <input name="bid" class="d-none" v-bind:value="boardgame.bid"/>
+      <input name="img" class="d-none" v-bind:value="boardgame.img"/>
+      <div class="col-md-6 text-center">
+        <img class="img-fluid" v-bind:src="'img/' + boardgame.img"/>
+      </div>
+      <div class="col-md-6 justify-content-center">
+        <label for="name" class="form-label">Name</label>
+        <input name="name" class="form-control" v-bind:value="boardgame.name"/>
+        <label class="form-label">Age</label>
+        <div class="input-group">
+          <span class="input-group-text">Max</span>
+          <input class="form-control" name="age_max" v-bind:value="boardgame.age_max"/>
+          <span class="input-group-text">Min</span>
+          <input class="form-control" name="age_min" v-bind:value="boardgame.age_min"/>
+        </div>
+        <label class="form-label">PLayers</label>
+        <div class="input-group">
+          <span class="input-group-text">Max</span>
+          <input class="form-control" name="player_max" v-bind:value="boardgame.player_max"/>
+          <span class="input-group-text">Min</span>
+          <input class="form-control" name="player_min" v-bind:value="boardgame.player_min"/>
+        </div>
+        <label class="form-label">Time</label>
+        <div class="input-group">
+          <span class="input-group-text">Max</span>
+          <input class="form-control" name="time_max" v-bind:value="boardgame.time_max"/>
+          <span class="input-group-text">Min</span>
+          <input class="form-control" name="time_min" v-bind:value="boardgame.time_min"/>
+        </div>
+        <label for="" class="form-label">Level</label>
+        <input class="form-control" name="level" v-bind:value="boardgame.level"/>
+        <label for="" class="form-label">Price</label>
+        <input class="form-control" name="price" v-bind:value="boardgame.price"/>
+        <label for="image-file" class="form-label">File</label>
+        <input type="file" name="image-file" class="form-control"/>
+      </div>
+      <div class="mb-2 mt-2 text-center">
+        <button type="submit" class="btn btn-success" formaction="edit-product">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button type="submit" class="btn btn-danger" formaction="delete-product">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </form>
   </div>
-<?php endif;?>
-<br>
-<?php if (isset($_SESSION['USER']) && $_SESSION['USER']->get_authority() == 'MEMBER'): ?>
-  Favourite Section
-  <br>
-  <form id="favourite" method="POST">
-    <?php if ($fid): ?>
-      <input type="text" style="display: none;" name="fid" value="<?=$fid[0]->get_fid()?>"/>
-      <input type="text" style="display: none;" name="bid" value="<?=$fid[0]->get_bid();?>"/>
-      <input type="text" style="display: none;" name="mid" value="<?=$fid[0]->get_mid();?>"/>
-      <input type="submit" formaction="/delete-favourite" value="remove favourite"/>
-    <?php else: ?>
-      <input style="display: none;" type="text" name="bid" value="<?=$boardgame->get_bid();?>"/>
-      <input style="display: none;" type="text" name="mid" value="<?=$mid?>"/>
-      <input type="submit" formaction="/add-favourite" value="favourite"/>
-    <?php endif; ?>
-  </form>
-<?php endif;?>
-Comment Section
-<br>
-<?php foreach($comments as $comment):?>
-  <div>
-    <?php if (isset($_SESSION['USER']) && $_SESSION['USER']->get_authority() == 'ADMIN'): ?>
-      <span><?=$comment['username']?>:</span>
-      <form method="POST">
-        cid:<input type="text" name="cid" value="<?=$comment['cid']?>"/>
-        <br>
-        bid:<input type="text" name="bid" value="<?=$boardgame->get_bid()?>"/>
-        <br>
-        mid:<input type="text" name="mid" value="<?=$mid?>"/>
-        <br>
-        content:<input type="text" name="content" value="<?=$comment['content']?>"/>
-        <br>
-        <input type="submit" formaction="/edit-comment" value="edit">
-        <input type="submit" formaction="/delete-comment" value="delete">
-      </form>
-    <?php else: ?>
-    <p>
-      <span><?=$comment['username']?>:</span>
-      <?=$comment['content']?>
-    </p>
+  <!-- Normal user -->
+  <div v-else class="container-lg">
+    <div class="row justify-content-center align-items-center">
+      <div class="col-md-6 text-center">
+        <img class="img-fluid" v-bind:src="'img/' + boardgame.img"/>
+      </div>
+      <div class="col-md-6 text-center">
+        <h1>
+          <form id="fav" v-if="fav" method="POST" action="delete-favourite">
+            <input class="d-none" type="text" name="fid" v-bind:value="fav[0].fid"/>
+            <input class="d-none" type="text" name="bid" v-bind:value="fav[0].bid"/>
+            <input class="d-none" type="text" name="mid" v-bind:value="fav[0].mid"/>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-bookmark-fill"></i>
+            </button>
+          </form>
+          <form v-else-if="role=='MEMBER'" method="POST" action="add-favourite" >
+            <input class="d-none" type="text" name="bid" v-bind:value="boardgame.bid"/>
+            <input class="d-none" type="text" name="mid" v-bind:value="member"/>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-bookmark"></i>
+            </button>
+          </form>
+          <div class="display-3">{{boardgame.name}}</div>
+          <div class="display-5 fw-bold">{{boardgame.price}} VND</div>
+          <div class="display-5 text-muted" v-if="boardgame.age_max == 0"><i class="fas fa-greater-than-equal fa-xs"></i> {{boardgame.age_min}} age</div>
+          <div class="display-5 text-muted" v-else>{{boardgame.age_min}}-{{boardgame.age_max}} age</div>
+          <div class="display-5 text-muted">
+            <i class="bi bi-person"></i>
+            {{boardgame.player_min}}-{{boardgame.player_max}} players
+          </div>
+          <div class="display-5 text-muted">
+            <i class="bi bi-hourglass-bottom"></i>
+            {{boardgame.time_min}}-{{boardgame.time_max}} minutes
+          </div>
+          <div class="display-5 text-muted"> 
+            Level:
+            <i v-for="index in boardgame.level" class="bi bi-star-fill">
+            </i><i v-for="index in (3-boardgame.level)" class="bi bi-star"></i>
+          </div>
+        </h1>
+      </div>
+    </div>
   </div>
-<?php endif;?>
-<?php endforeach?>
-<?php if (isset($_SESSION['USER']) && $_SESSION['USER']->get_authority() == 'MEMBER'): ?>
-  <form id="comment" action="/add-comment" method="POST">
-    <input style="display: none;" type="text" name="bid" value="<?=$boardgame->get_bid();?>"/>
-    <input style="display: none;" type="text" name="mid" value="<?=$mid?>"/>
-    content:<input type="text" name="content"/>
-    <input type="submit" value="comment"/>
-  </form>
-<?php endif;?>
+</section>
+
+<section id="comments-container">
+  <div class="container-lg bg-light p-4">
+
+    <!-- Admin -->
+    <div v-if="role=='ADMIN'" class="row justify-content-center">
+      <div class="col-8">
+        <form method="POST" v-for="comment in comments">
+          <input type="text" class="d-none" name="cid" v-bind:value="comment.cid"/>
+          <input type="text" class="d-none" name="bid" v-bind:value="boardgame.bid"/>
+          <input type="text" class="d-none" name="mid" v-bind:value="member"/>
+          <label for="content" class="lead fw-bold form-label ms-2">{{comment.username}}</label>
+          <div class="input-group">
+            <input type="text" name="content" class="form-control" v-bind:value="comment.content"/>
+            <button type="submit" formaction="/edit-comment">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button type="submit" formaction="/delete-comment">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Normal user -->
+    <div v-else class="row justify-content-center">
+      <div class="col-8">
+        <div class="list-group">
+          <div class="list-group-item py-2" v-for="comment in comments">
+            <h5 class="lead fw-bold mb-1 ms-2">{{comment.username}}</h5>
+            <p class="mb-1">{{comment.content}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member only -->
+    <form v-if="role=='MEMBER'" @submit="submit_comment" class="row justify-content-center mt-2" action="/add-comment" method="POST">
+      <div class="col-8">
+        <input class="d-none" type="text" name="bid" v-bind:value="boardgame.bid"/>
+        <input class="d-none" type="text" name="mid" v-bind:value="member"/>
+        <div class="input-group">
+          <input type="text" class="form-control" name="content" v-model="content"/>
+          <button type="submit" class="btn btn-secondary">Comment</button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</section>
+
+
+<script type="module" > 
+  <?php include __TEMPLATE__."script".DL."product-detail.js" ?>
+</script>
+<?php include __TEMPLATE__.'html\\footer.html'?>

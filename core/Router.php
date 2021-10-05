@@ -133,7 +133,7 @@ class Router
 		$url == ($GLOBALS['config']['security.login_processing'] ?? '/login'))
 			Router::$security->authenticate();
 		if (isset(router::$security) && 
-		$_SERVER['REQUEST_METHOD'] === RequestMethod::POST &&
+		$_SERVER['REQUEST_METHOD'] === RequestMethod::GET &&
 		$url == ($GLOBALS['config']['security.logout_processing'] ?? '/logout'))
 			Router::$security->logout();
 

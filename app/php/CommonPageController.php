@@ -24,7 +24,7 @@ class CommonPageController
   #[RequestMapping(value: '/product-list', method: RequestMethod::GET)]
   function get_product_list(Model $model)
   {
-    $alph = $_GET['alph'] ?? null;
+    $alph = $_GET['name'] ?? null;
     $price = $_GET['price'] ?? null;
     $level = $_GET['level'] ?? null;
     if (isset($_GET['search']))

@@ -21,6 +21,7 @@ class RegisterController
   function post_do_register(Model $model)
   {
     $user = form_model('User');
+    $member = form_model('Member');
     try{
       $user = $this->usedetails_service->save_user($user);
     }catch (\mysqli_sql_exception $e)
@@ -32,7 +33,7 @@ class RegisterController
       }
       throw $e;
     }
-    $member = Member::Member($user->get_uid());
+    $member->set_uid($user->get_uid());
     $member = $this->member_service->save_member($member);
     return 'Location: /member-info';
   }

@@ -11,11 +11,13 @@ class HttpException extends \Exception
       case '403': 
       {
         include 'core\\error\\403.html';
+        http_response_code(403);
         exit();
       }
       case '404': 
       {
         include 'core\\error\\404.html';
+        http_response_code(404);
         exit();
       }
     }

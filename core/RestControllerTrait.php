@@ -12,11 +12,11 @@ trait RestControllerTrait
 	{
 		if (!$result) return;
 		if (is_array($result))
-			echo '['.implode(',',array_map(function($instance){
+			return json_encode(array_map(function($instance){
 				return serialize_object($instance);
-			}, $result)).']';
+			}, $result));
 		else
-			echo serialize_object($result);
+			return json_encode(serialize_object($result));
 	}
 
 	public function autowired($class)

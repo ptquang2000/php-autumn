@@ -59,21 +59,12 @@
       </div>
       <div class="col-md-6 text-center">
         <h1>
-          <form id="fav" v-if="fav" method="POST" action="delete-favourite">
-            <input class="d-none" type="text" name="fid" v-bind:value="fav[0].fid"/>
-            <input class="d-none" type="text" name="bid" v-bind:value="fav[0].bid"/>
-            <input class="d-none" type="text" name="mid" v-bind:value="fav[0].mid"/>
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-bookmark-fill"></i>
-            </button>
-          </form>
-          <form v-else-if="role=='MEMBER'" method="POST" action="add-favourite" >
-            <input class="d-none" type="text" name="bid" v-bind:value="boardgame.bid"/>
-            <input class="d-none" type="text" name="mid" v-bind:value="member"/>
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-bookmark"></i>
-            </button>
-          </form>
+          <button v-if="fav" @click="delete_fav" @click="delete_fav" class="btn btn-primary">
+            <i class="bi bi-bookmark-fill"></i>
+          </button>
+          <button v-else-if="role=='MEMBER'" @click="add_fav" class="btn btn-primary">
+            <i class="bi bi-bookmark"></i>
+          </button>
           <div class="display-3">{{boardgame.name}}</div>
           <div class="display-5 fw-bold">{{boardgame.price}} VND</div>
           <div class="display-5 text-muted" v-if="boardgame.age_max == 0"><i class="fas fa-greater-than-equal fa-xs"></i> {{boardgame.age_min}} age</div>
@@ -103,17 +94,15 @@
     <!-- Admin -->
     <div v-if="role=='ADMIN'" class="row justify-content-center">
       <div class="col-8">
-        <form method="POST" v-for="comment in comments">
-          <input type="text" class="d-none" name="cid" v-bind:value="comment.cid"/>
-          <input type="text" class="d-none" name="bid" v-bind:value="boardgame.bid"/>
-          <input type="text" class="d-none" name="mid" v-bind:value="member"/>
+        <form method="POST" v-for="(comment, idx) in comments">
+          <input type="text" class="d-none" name="cid" v-model="comments[idx].cid"/>
           <label for="content" class="lead fw-bold form-label ms-2">{{comment.username}}</label>
           <div class="input-group">
-            <input type="text" name="content" class="form-control" v-bind:value="comment.content"/>
-            <button type="submit" formaction="/edit-comment">
+            <input type="text" name="content" class="form-control" v-model="comments[idx].content"/>
+            <button type="submit" @click="edit_comment($event, idx)">
               <i class="bi bi-pencil"></i>
             </button>
-            <button type="submit" formaction="/delete-comment">
+            <button type="submit" @click="delete_comment($event, idx)">
               <i class="bi bi-trash"></i>
             </button>
           </div>
@@ -136,8 +125,6 @@
     <!-- Member only -->
     <form v-if="role=='MEMBER'" @submit="submit_comment" class="row justify-content-center mt-2" action="/add-comment" method="POST">
       <div class="col-8">
-        <input class="d-none" type="text" name="bid" v-bind:value="boardgame.bid"/>
-        <input class="d-none" type="text" name="mid" v-bind:value="member"/>
         <div class="input-group">
           <input type="text" class="form-control" name="content" v-model="content"/>
           <button type="submit" class="btn btn-secondary">Comment</button>

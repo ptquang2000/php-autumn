@@ -206,7 +206,7 @@ class Router
 		$result = Router::$controller->{Router::$paths[Router::$path]['class_method']}
 			(...Router::$df_parts);
 		if ($type == 'Core\RestControllerTrait')
-			RestControllerTrait::encode($result);
+			echo RestControllerTrait::encode($result);
 		else if ($type == 'Core\ControllerTrait')
 			Router::$controller->init_view($result)->render();	
 	}

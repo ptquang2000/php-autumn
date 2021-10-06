@@ -27,6 +27,7 @@ function PIPHP_ImageResize($image, $w, $h)
 
 function serialize_object($obj){
   if (!$obj) return null;
+  if ($obj instanceof \stdClass) return $obj;
   if (is_array($obj))
     return array_map(function($instance){
       return serialize_object($instance);
@@ -35,7 +36,10 @@ function serialize_object($obj){
   $new_ins = new \stdClass();
   foreach($props as $prop)
   {
-    $new_ins->{$prop->getName()} = $obj->{'get_'.$prop->getName()}();
+    if ($prop->isPublic())
+      $new_ins->{$prop->getName()} = $obj->{$prop->getName()};
+    else
+      $new_ins->{$prop->getName()} = $obj->{'get_'.$prop->getName()}();
     if (!is_scalar($new_ins->{$prop->getName()}))
     {
       $parsed_obj = array();

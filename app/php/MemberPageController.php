@@ -100,15 +100,6 @@ class MemberPageController
     $url = isset($url['query']) ? $url['path'].'?'.$url['query'] : $url['path'];
     return $url;
   }
-
-  #[RequestMapping(value: '/add-comment', method: RequestMethod::POST)]
-  #[EnableSecurity(role:['MEMBER'])]
-  function post_save_comment()
-  {
-    $new_comment = form_model('Comment');
-    $new_comment = $this->comment_service->save_comment($new_comment);
-    return 'Location: /product-detail?id='.$new_comment->get_bid();
-  }
 }
 
 ?>

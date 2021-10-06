@@ -125,7 +125,7 @@
     </div>
 
     <!-- Member only -->
-    <form v-if="role=='MEMBER'" @submit="submit_comment" class="row justify-content-center mt-2" action="/add-comment" method="POST">
+    <form v-if="role!='ANONYMOUS'" @submit="submit_comment" class="row justify-content-center mt-2" action="/add-comment" method="POST">
       <div class="col-8">
         <div class="input-group">
           <input type="text" class="form-control" name="content" v-model="content"/>

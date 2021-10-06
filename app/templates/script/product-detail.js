@@ -67,9 +67,7 @@ new Vue(
         }),{
           headers:{"Content-Type": "application/x-www-form-urlencoded",}
         }).then(function (response) {
-          var regex = new RegExp('var comments = .*;')
-          var comments = response.data.match(regex)[0]
-          return JSON.parse(comments.substring(15, comments.length-1))
+          return response.data
         }).then(
           comments => {
             this.comments = comments
@@ -88,12 +86,9 @@ new Vue(
             "Content-Type": "application/x-www-form-urlencoded",
           }
         }).then(function (response) {
-          var regex = new RegExp('var comments = .*;')
-          var comments = response.data.match(regex)[0]
-          return JSON.parse(comments.substring(15, comments.length-1))
+          return response.data
         }).then(comments => {
           this.comments = comments
-          this.content = ''
         })
       },
       delete_comment: function(e, idx){
@@ -106,12 +101,9 @@ new Vue(
         }),{
           headers:{"Content-Type": "application/x-www-form-urlencoded",}
         }).then(function (response) {
-          var regex = new RegExp('var comments = .*;')
-          var comments = response.data.match(regex)[0]
-          return JSON.parse(comments.substring(15, comments.length-1))
+          return response.data
         }).then(comments => {
           this.comments = comments
-          this.content = ''
         })
       }
     }

@@ -103,25 +103,6 @@ class AdminController
     $boardgame = $this->boardgame_service->delete_boardgame($boardgame);
     return 'Location: /product-list';
   }
-
-  #[RequestMapping(value: '/edit-comment', method: RequestMethod::POST)]
-  #[EnableSecurity(role: ['ADMIN'])]
-  function post_edit_comment()
-  {
-    $edited_cmt = form_model('Comment');
-    $edited_cmt = $this->comment_service->save_comment($edited_cmt);
-    return 'Location: /product-detail?id='.$edited_cmt->get_bid();
-  }
-  
-  #[RequestMapping(value: '/delete-comment', method: RequestMethod::POST)]
-  #[EnableSecurity(role: ['ADMIN'])]
-  function post_delete_comment()
-  {
-    $deleted_cmt = form_model('Comment');
-    $bid = $deleted_cmt->get_bid();
-    $deleted_cmt = $this->comment_service->delete_comment($deleted_cmt);
-    return 'Location: /product-detail?id='.$bid;
-  }
 }
 
 ?>

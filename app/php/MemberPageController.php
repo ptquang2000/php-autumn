@@ -8,36 +8,13 @@ class MemberPageController
 {
   #[Autowired]
   private MemberService $member_service; 
-  #[Autowired]
-  private CommentService $comment_service; 
-  #[Autowired]
-  private FavouriteService $favourite_service; 
-  #[Autowired]
-  private BoardgameService $boardgame_service; 
 
   #[RequestMapping(value: '/member-info', method: RequestMethod::GET)]
-  #[EnableSecurity(role: ['MEMBER'])]
-  function get_member_info(Model $model)
+  #[EnableSecurity(role: ['MEMBER', 'ADMIN'])]
+  function get_member_info()
   {
-    $user = $_SESSION['USER'];
-    $member = $this->member_service->get_member_by_uid($user->get_uid())[0];
-
-    $favs = $this->favourite_service->get_favourite_by_mid($member->get_mid());
-    $model->add_attribute('fid', $favs);
-    $boardgames = array_map([$this->boardgame_service, 'get_boardgame'], 
-      array_map(function($fav){return $fav->get_bid();},$favs));
-    $model->add_attribute('boardgames', $boardgames);
-
-    $member = [
-      'name' => $member->get_name(),
-      'email' => $member->get_email(),
-      'phone' => $member->get_phone(),
-      'address' => $member->get_address(),
-      'birth' => $member->get_birth(),
-      'img' => $member->get_img()
-    ];
-    $model->add_attribute('member', $member);
-
+    if ($_SESSION['USER']->get_authority() == 'ADMIN')
+      return 'Location: /member-list';
     return 'member-info.php';
   }
 
@@ -72,34 +49,25 @@ class MemberPageController
     return 'Location: /member-info';
   }
 
-  #[RequestMapping(value: '/add-favourite', method: RequestMethod::POST)]
-  #[EnableSecurity(role:['MEMBER'])]
-  function post_add_favourite()
+  #[RequestMapping(value: '/member/img', method: RequestMethod::GET)]
+  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
+  public function get_member_image()
   {
-    $new_favourite = form_model('Favourite');
-    $member = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0];
-    if ($member->get_mid() == $new_favourite->get_mid())
-      $new_favourite = $this->favourite_service->save_favourite($new_favourite);
-    return 'Location: '.$this->last_url();
+    if ($_SESSION['USER']->get_authority() == 'ADMIN')
+    {
+      $url = $_SERVER['HTTP_REFERER'];
+      $parts = explode('/', $url);
+      $mid = $parts[array_key_last($parts)];
+      $img = $this->member_service->get_member($mid)->get_img();
+      if (file_exists(__IMAGE__.$img) && !empty($img))
+        return base64_encode((file_get_contents(__IMAGE__.$img)));
+    }
+    $mid = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0]->get_mid();
+    $img = $this->member_service->get_member($mid)->get_img();
+    if (file_exists(__IMAGE__.$img) && !empty($img))
+      return base64_encode((file_get_contents(__IMAGE__.$img)));
   }
 
-  #[RequestMapping(value: '/delete-favourite', method: RequestMethod::POST)]
-  #[EnableSecurity(role:['MEMBER'])]
-  function post_delete_favourite()
-  {
-    $deleted_favourite = form_model('Favourite');
-    $member = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0];
-    if ($member->get_mid() == $deleted_favourite->get_mid())
-      $this->favourite_service->delete_favourite($deleted_favourite);
-    return 'Location: '.$this->last_url();
-  }
-
-  private function last_url()
-  {
-    $url = parse_url($_SERVER['HTTP_REFERER']);
-    $url = isset($url['query']) ? $url['path'].'?'.$url['query'] : $url['path'];
-    return $url;
-  }
 }
 
 ?>

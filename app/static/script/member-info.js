@@ -1,7 +1,13 @@
-var member = <?= json_encode($member)?>;
-var image = '<?= file_exists(__IMAGE__.$member['img']) && !empty($member['img']) ? base64_encode(file_get_contents(__IMAGE__.$member['img'])) : 'false'?>';
-var boardgames = <?= json_encode(serialize_object($boardgames))?>;
-var fav = <?= isset($fid) ? json_encode(serialize_object($fid)) : 'false'?>;
+axios.all([
+  axios.get(`/member/boardgames`),
+  axios.get(`/favourite`),
+  axios.get(`/member`),
+  axios.get(`/member/img`),
+]).then(axios.spread((res1, res2, res3, res4)=>{
+var boardgames = res1.data ? res1.data : []
+var fav = res2.data ? res2.data : []
+var member = res3.data instanceof Object ? res3.data : false
+var image = res4.data
 
 new Vue(
   {
@@ -25,13 +31,6 @@ new Vue(
       redirect: function(id){
         window.location.href = `/product-detail?id=${id}`
       },
-      option: function(key, value)
-      {
-        var regex = new RegExp(`${key}=[^&]*`)
-        var params = window.location.search.substring(1)
-        var new_params = params.replace(regex, `${key}=${value}`)
-        return params == new_params ? params + `&${key}=${value}` : new_params
-      },
       delete_fav: function(idx)
       {
         var fav = this.fav.filter(fav => fav.bid == this.boardgames[idx].bid)[0]
@@ -41,12 +40,14 @@ new Vue(
           fid: fav.fid,
         }),{
           headers:{"Content-Type": "application/x-www-form-urlencoded",}
-        }).then(function () {
-        }).then(() => {
-          this.fav.splice(idx, 1)
+        }).then(function (response) {
+          return response.data
+        }).then((favs) => {
+          this.fav = favs ? favs : []
           this.boardgames.splice(idx, 1)
         })
       },
     }
   }
 )
+}))

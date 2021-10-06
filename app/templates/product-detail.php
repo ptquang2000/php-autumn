@@ -138,7 +138,5 @@
 </section>
 
 
-<script type="module" > 
-  <?php include __TEMPLATE__."script".DL."product-detail.js" ?>
-</script>
+<script src="/script/product-detail.js"></script>
 <?php include __TEMPLATE__.'html\\footer.html'?>

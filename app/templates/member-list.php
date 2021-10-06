@@ -20,12 +20,10 @@
       </div>
       <div class="col-lg-4 col-md-4 lead">{{member.email}}</div>
       <div class="col-lg-4 col-md-4 lead">{{member.phone}}</div>
-      <i v-on:click="redirect(member.uid)" class="col-lg-1 col-md-1 bi bi-arrow-right-square-fill fa-lg"></i>
+      <i v-on:click="redirect(member.mid)" class="col-lg-1 col-md-1 bi bi-arrow-right-square-fill fa-lg"></i>
     </div>
   </div>
 </section>
 
-<script type="text/javascript" > 
-  <?php include __TEMPLATE__."script".DL."member-list.js" ?>
-</script>
+<script type="text/javascript" src="/script/member-list.js"></script>
 <?php include __TEMPLATE__.'html\\footer.html'?>

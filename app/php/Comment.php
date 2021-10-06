@@ -1,7 +1,7 @@
 <?php
 
 namespace App\PHP;
-use Core\{Table, ID, Column};
+use Core\{Table, ID, Column, ManyToOne};
 
 #[Table(name: 'comment')]
 class Comment 
@@ -14,6 +14,11 @@ class Comment
   private $mid;
   #[Column(name: 'content')]
   private $content;
+
+  #[ManyToOne(name:'mid', map_by:'Member')]
+  private $member;
+  public function get_member(){return $this->member;}
+  public function set_member($member){$this->member = $member;}
 
   public function get_cid(){return $this->cid;}
   public function set_cid($cid){$this->cid = $cid;}

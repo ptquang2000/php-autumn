@@ -31,7 +31,7 @@
   </div>
 
   <div id="boardgames-container" class="row mt-5 mb-5 g-5">
-    <div class="card-group col-lg-3 col-md-4 col-sm-5 col-8" v-for="(boardgame, idx) in boardgames" v-bind:id="boardgame.bid">
+    <div class="card-group col-lg-3 col-md-4 col-sm-5 col-8" v-for="(boardgame, idx) in boardgames" v-bind:id="boardgame.bid" v-cloak>
       <div class="card border-2" style="width: 18rem;">
         <div class="card-header bg-white h-100 border-0 d-flex align-items-start justify-content-between">
           <h5>{{boardgame.name}}</h5>
@@ -52,7 +52,5 @@
 
 </section>
 
-<script type="text/javascript" > 
-  <?php include __TEMPLATE__."script".DL."product-list.js" ?>
-</script>
+<script type="text/javascript" src="/script/product-list.js"></script>
 <?php include __TEMPLATE__.'html\\footer.html'?>

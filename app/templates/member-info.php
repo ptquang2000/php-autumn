@@ -2,7 +2,7 @@
 <?php include __TEMPLATE__.'html\\navbar.php'?>
 
 
-<section id="info">
+<section id="info" v-cloak>
   <div class="container d-flex align-items-start my-5">
     <!-- Tab button -->
     <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -23,7 +23,7 @@
                 </button>
               </div>
               <div class="card-body">
-                <img class="card-img-top" v-bind:src="'img/' + boardgame.img"/>
+                <img class="card-img-top" v-bind:src="'/img/' + boardgame.img"/>
               </div>
             </div>
           </div>
@@ -92,7 +92,5 @@
   </div>
 </section>
 
-<script type="text/javascript" > 
-  <?php include __TEMPLATE__."script".DL."member-info.js" ?>
-</script>
+<script type="text/javascript" src="/script/member-info.js"></script>
 <?php include __TEMPLATE__.'html\\footer.html'?>

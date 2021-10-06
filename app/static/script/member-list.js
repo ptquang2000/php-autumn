@@ -1,5 +1,7 @@
-var members = <?= json_encode($members)?>;
-
+axios.all([
+  axios.get(`/members`),
+]).then(axios.spread((res1)=>{
+var members = res1.data ? res1.data : []
 new Vue(
   {
     el:'#members',
@@ -13,3 +15,4 @@ new Vue(
     }
   }
 )
+}))

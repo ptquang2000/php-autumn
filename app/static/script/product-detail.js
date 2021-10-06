@@ -1,7 +1,16 @@
-var boardgame = <?= json_encode(serialize_object($boardgame))?>;
-var fav = <?= isset($fid) ? json_encode(serialize_object($fid)) : 'false'?>;
-var member = <?= isset($mid) ? json_encode($mid) : 'false'?>;
-var comments = <?=json_encode($comments)?>;
+const bid = (new URL(window.location.href)).searchParams.get("id")
+
+axios.all([
+  axios.get(`/boardgame/${bid}`),
+  axios.get(`/favourite/${bid}`),
+  axios.get(`/member`),
+  axios.get(`/comment/${bid}`),
+]).then(axios.spread((res1, res2, res3, res4)=>{
+
+var boardgame = res1.data
+var fav = res2.data instanceof Object ? res2.data : false
+var member = res3.data instanceof Object ? res3.data.mid : false
+var comments = res4.data
 
 new Vue(
   {
@@ -9,7 +18,7 @@ new Vue(
     data:{
       boardgame: boardgame,
       role: role,
-      fav: fav[0],
+      fav: fav,
       member: member,
     },
     methods:{
@@ -22,9 +31,14 @@ new Vue(
         }),{
           headers:{"Content-Type": "application/x-www-form-urlencoded",}
         }).then(function (response) {
-          return false
-        }).then(fav => {
-          this.fav = fav
+          return response.data
+        }).then(favs => {
+          if (!favs) this.fav = false
+          else {
+            fav = favs.filter(fav=>fav.bid==this.boardgame.bid)
+            if (fav.length == 0) this.fav = false
+            else this.fav = fav[0]
+          }
         })
       },
       add_fav: function()
@@ -35,11 +49,9 @@ new Vue(
         }),{
           headers:{"Content-Type": "application/x-www-form-urlencoded",}
         }).then(function (response) {
-          var regex = new RegExp('var fav = .*;')
-          var fav = response.data.match(regex)[0]
-          return JSON.parse(fav.substring(10, fav.length-1))[0]
-        }).then(fav => {
-          this.fav = fav
+          return response.data
+        }).then(favs => {
+          this.fav = favs.filter(fav=>fav.bid==this.boardgame.bid)[0]
         })
       }
     }
@@ -109,3 +121,5 @@ new Vue(
     }
   }
 )
+
+}))

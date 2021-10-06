@@ -9,8 +9,13 @@ class CommentController
 {
   #[Autowired]
   private CommentService $comment_service; 
-  #[Autowired]
-  private MemberService $member_service; 
+
+  #[RequestMapping(value: '/comment/$bid', method: RequestMethod::GET)]
+  public function get_comment($bid)
+  {
+    $comments = array_map([$this, 'load_comments'], $this->comment_service->get_comment_by_bid($bid));
+    return $comments;
+  }
 
   #[RequestMapping(value: '/add-comment', method: RequestMethod::POST)]
   #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
@@ -43,8 +48,11 @@ class CommentController
   }
 
   private function load_comments($cmt){
-    $object = serialize_object($cmt);
-    $object->username = $this->member_service->get_member($object->mid)->get_user()->get_username();
+    $object = new \stdClass();
+    $object->bid = $cmt->get_bid();
+    $object->content = $cmt->get_content();
+    $object->cid = $cmt->get_cid();
+    $object->username = $cmt->get_member()->get_user()->get_username();
     return $object;
   }
 }

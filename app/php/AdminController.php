@@ -15,44 +15,18 @@ class AdminController
   private FavouriteService $favourite_service;
   #[Autowired]
   private CommentService $comment_service;
-  #[Autowired]
-  private MyUserDetailsService $userdetails_service;
 
   #[RequestMapping(value: '/member-list', method: RequestMethod::GET)]
   #[EnableSecurity(role: ['ADMIN'])]
-  function get_list_user(Model $model)
+  function get_list_user()
   {
-    $members = $this->member_service->get_all_members();
-    $members = array_map(function($member) {
-      return [
-      'mid' => $member->get_mid(),
-      'uid' => $member->get_uid(),
-      'username' => $member->get_user()->get_username(),
-      'email' => $member->get_email(),
-      'phone' => $member->get_phone(),
-    ];}, $members);
-    $model->add_attribute('members', $members);
     return 'member-list.php';
   }
 
   #[RequestMapping(value: '/member-info/$mid', method: RequestMethod::GET)]
   #[EnableSecurity(role: ['ADMIN'])]
-  function get_member_info_admin(Model $model, $mid)
+  function get_member_info_admin($mid)
   {
-    $member = $this->member_service->get_member($mid);
-    if (!$member) 
-      throw new HttpException('404');
-    $member = [
-      'mid' => $member->get_mid(),
-      'uid' => $member->get_uid(),
-      'name' => $member->get_name(),
-      'email' => $member->get_email(),
-      'phone' => $member->get_phone(),
-      'address' => $member->get_address(),
-      'birth' => $member->get_birth(),
-      'img' => $member->get_img()
-    ];
-    $model->add_attribute('member', $member);
     return 'member-info.php';
   }
 

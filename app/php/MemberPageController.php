@@ -12,6 +12,8 @@ class MemberPageController
   private CommentService $comment_service; 
   #[Autowired]
   private FavouriteService $favourite_service; 
+  #[Autowired]
+  private BoardgameService $boardgame_service; 
 
   #[RequestMapping(value: '/member-info', method: RequestMethod::GET)]
   #[EnableSecurity(role: ['MEMBER'])]
@@ -19,6 +21,13 @@ class MemberPageController
   {
     $user = $_SESSION['USER'];
     $member = $this->member_service->get_member_by_uid($user->get_uid())[0];
+
+    $favs = $this->favourite_service->get_favourite_by_mid($member->get_mid());
+    $model->add_attribute('fid', $favs);
+    $boardgames = array_map([$this->boardgame_service, 'get_boardgame'], 
+      array_map(function($fav){return $fav->get_bid();},$favs));
+    $model->add_attribute('boardgames', $boardgames);
+
     $member = [
       'name' => $member->get_name(),
       'email' => $member->get_email(),
@@ -28,6 +37,7 @@ class MemberPageController
       'img' => $member->get_img()
     ];
     $model->add_attribute('member', $member);
+
     return 'member-info.php';
   }
 
@@ -70,7 +80,7 @@ class MemberPageController
     $member = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0];
     if ($member->get_mid() == $new_favourite->get_mid())
       $new_favourite = $this->favourite_service->save_favourite($new_favourite);
-    return 'Location: /product-detail?id='.$new_favourite->get_bid();
+    return 'Location: '.$this->last_url();
   }
 
   #[RequestMapping(value: '/delete-favourite', method: RequestMethod::POST)]
@@ -80,12 +90,15 @@ class MemberPageController
     $deleted_favourite = form_model('Favourite');
     $member = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0];
     if ($member->get_mid() == $deleted_favourite->get_mid())
-    {
-      $bid = $deleted_favourite->get_bid();
       $this->favourite_service->delete_favourite($deleted_favourite);
-      return 'Location: /product-detail?id='.$bid;
-    }
-    return 'Location: /product-list';
+    return 'Location: '.$this->last_url();
+  }
+
+  private function last_url()
+  {
+    $url = parse_url($_SERVER['HTTP_REFERER']);
+    $url = isset($url['query']) ? $url['path'].'?'.$url['query'] : $url['path'];
+    return $url;
   }
 
   #[RequestMapping(value: '/add-comment', method: RequestMethod::POST)]

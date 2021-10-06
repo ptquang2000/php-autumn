@@ -31,10 +31,16 @@
   </div>
 
   <div id="boardgames-container" class="row mt-5 mb-5 g-5">
-    <div class="card-group col-lg-3 col-md-4 col-sm-5 col-8" v-for="boardgame in boardgames" v-bind:id="boardgame.bid">
+    <div class="card-group col-lg-3 col-md-4 col-sm-5 col-8" v-for="(boardgame, idx) in boardgames" v-bind:id="boardgame.bid">
       <div class="card border-2" style="width: 18rem;">
-        <div class="card-header bg-white d-flex align-items-center justify-content-center h-100 border-0">
+        <div class="card-header bg-white h-100 border-0 d-flex align-items-start justify-content-between">
           <h5>{{boardgame.name}}</h5>
+          <button type="submit" v-if="fav && favs[idx]" @click="delete_fav(idx)" class="btn btn-primary">
+            <i class="bi bi-bookmark-fill"></i>
+          </button>
+          <button type="submit" v-else-if="role=='MEMBER'" @click="add_fav(idx)" class="btn btn-primary"> 
+            <i class="bi bi-bookmark"></i>
+          </button>
         </div>
         <div class="card-body">
           <img class="card-img-top" v-on:click="redirect(boardgame.bid)" v-bind:src="'img/' + boardgame.img"/>

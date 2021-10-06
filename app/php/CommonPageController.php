@@ -38,6 +38,16 @@ class CommonPageController
       'boardgames', 
       $this->boardgame_service->get_all_boardgames($alph, $price, $level)
       );
+
+    if (isset($_SESSION['USER']))
+    {
+      $mid = $this->member_service->get_member_by_uid(
+        $_SESSION['USER']->get_uid())[0]->get_mid();
+      $model->add_attribute('mid', $mid);
+      $fid = $this->favourite_service->get_favourite_by_mid($mid);
+      if ($fid)
+        $model->add_attribute('fid', $fid);
+    }
     return 'product-list.php';
   }
 
@@ -63,8 +73,9 @@ class CommonPageController
       $mid = $this->member_service->get_member_by_uid(
         $_SESSION['USER']->get_uid())[0]->get_mid();
       $model->add_attribute('mid', $mid);
-      $fid = $this->favourite_service->get_favourite_by_mid($mid);
-      $model->add_attribute('fid', $fid);
+      $fid = $this->favourite_service->get_favourite_by_member($mid, $boardgame->get_bid());
+      if ($fid)
+        $model->add_attribute('fid', $fid);
     }
     return 'product-detail.php';
   }

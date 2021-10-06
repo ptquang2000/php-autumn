@@ -9,14 +9,13 @@ new Vue(
     data:{
       boardgame: boardgame,
       role: role,
-      fav: fav,
+      fav: fav[0],
       member: member,
     },
     methods:{
-      delete_fav: function(e)
+      delete_fav: function()
       {
-        e.preventDefault()
-        this.fav = axios.post("/delete-favourite", Qs.stringify({
+        axios.post("/delete-favourite", Qs.stringify({
           bid: this.fav.bid,
           mid: this.fav.mid,
           fid: this.fav.fid,
@@ -28,10 +27,9 @@ new Vue(
           this.fav = fav
         })
       },
-      add_fav: function(e)
+      add_fav: function()
       {
-        e.preventDefault()
-        this.fav = axios.post("/add-favourite", Qs.stringify({
+        axios.post("/add-favourite", Qs.stringify({
           bid: this.boardgame.bid,
           mid: this.member,
         }),{
@@ -62,7 +60,7 @@ new Vue(
       submit_comment: function(e){
         e.preventDefault()
         if (this.content)
-        this.comments = axios.post("/add-comment", Qs.stringify({
+        axios.post("/add-comment", Qs.stringify({
           bid: this.boardgame.bid,
           mid: this.member,
           content: this.content
@@ -80,7 +78,7 @@ new Vue(
       },
       edit_comment: function(e, idx){
         e.preventDefault()
-        this.comments = axios.post("/edit-comment", Qs.stringify({
+        axios.post("/edit-comment", Qs.stringify({
           cid: this.comments[idx].cid,
           bid: this.boardgame.bid,
           mid: this.member,
@@ -100,7 +98,7 @@ new Vue(
       },
       delete_comment: function(e, idx){
         e.preventDefault()
-        this.comments = axios.post("/delete-comment", Qs.stringify({
+        axios.post("/delete-comment", Qs.stringify({
           cid: this.comments[idx].cid,
           bid: this.boardgame.bid,
           mid: this.member,

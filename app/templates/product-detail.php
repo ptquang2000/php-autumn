@@ -59,12 +59,14 @@
       </div>
       <div class="col-md-6 text-center">
         <h1>
-          <button v-if="fav" @click="delete_fav" @click="delete_fav" class="btn btn-primary">
-            <i class="bi bi-bookmark-fill"></i>
-          </button>
-          <button v-else-if="role=='MEMBER'" @click="add_fav" class="btn btn-primary">
-            <i class="bi bi-bookmark"></i>
-          </button>
+          <form method="POST" @submit.prevent>
+            <button type="submit" v-if="fav" @click="delete_fav" class="btn btn-primary">
+              <i class="bi bi-bookmark-fill"></i>
+            </button>
+            <button type="submit" v-else-if="role=='MEMBER'" @click="add_fav" class="btn btn-primary">
+              <i class="bi bi-bookmark"></i>
+            </button>
+          </form>
           <div class="display-3">{{boardgame.name}}</div>
           <div class="display-5 fw-bold">{{boardgame.price}} VND</div>
           <div class="display-5 text-muted" v-if="boardgame.age_max == 0"><i class="fas fa-greater-than-equal fa-xs"></i> {{boardgame.age_min}} age</div>

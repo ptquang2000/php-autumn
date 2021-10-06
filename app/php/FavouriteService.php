@@ -25,6 +25,11 @@ class FavouriteService
     return $this->favourite_repository->find_by_mid($mid);
   }
 
+  public function get_favourite_by_member($mid, $bid)
+  {
+    return $this->favourite_repository->find_by_mid_and_bid($mid, $bid);
+  }
+
   public function get_favourite_by_bid($mid)
   {
     return $this->favourite_repository->find_by_bid($mid);

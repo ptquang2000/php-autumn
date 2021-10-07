@@ -17,7 +17,7 @@ class MemberPageController
   {
     if ($_SESSION['USER']->get_authority() == 'ADMIN')
       return 'Location: /member-list';
-    return 'member-info.php';
+    return 'member-info.html';
   }
 
   #[RequestMapping(value: '/save-user', method: RequestMethod::POST)]

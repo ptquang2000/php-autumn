@@ -5,12 +5,14 @@ axios.all([
   axios.get(`/favourite/${bid}`),
   axios.get(`/member`),
   axios.get(`/comment/${bid}`),
-]).then(axios.spread((res1, res2, res3, res4)=>{
+  axios.get('user-role'),
+]).then(axios.spread((res1, res2, res3, res4, res5)=>{
 
 var boardgame = res1.data
 var fav = res2.data instanceof Object ? res2.data : false
 var member = res3.data instanceof Object ? res3.data.mid : false
 var comments = res4.data
+var role = res5.data
 
 new Vue(
   {

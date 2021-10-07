@@ -1,4 +1,4 @@
-const error = <?= isset($register_error) ? json_encode($register_error) : 'false'?>;
+const error = (new URLSearchParams(window.location.search)).get('error');
 
 new Vue({
   el: '#register-section',

@@ -24,7 +24,7 @@ class CommonPageController
   #[RequestMapping(value: '/product-list', method: RequestMethod::GET)]
   function get_product_list()
   {
-    return 'product-list.php';
+    return 'product-list.html';
   }
 
   #[RequestMapping(value: '/product-detail', method: RequestMethod::GET)]
@@ -53,7 +53,7 @@ class CommonPageController
       if ($fid)
         $model->add_attribute('fid', $fid);
     }
-    return 'product-detail.php';
+    return 'product-detail.html';
   }
 
   private function match_member_comment($comment)
@@ -68,7 +68,7 @@ class CommonPageController
   #[RequestMapping(value: '/news', method: RequestMethod::GET)]
   function get_news()
   {
-    return 'news.php';
+    return 'news.html';
   }
 }
 

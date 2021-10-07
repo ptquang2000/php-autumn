@@ -1,4 +1,4 @@
-const error = <?= isset($_SESSION['LOGIN-ERROR']) ? json_encode($_SESSION['LOGIN-ERROR']) : 'false'?>;
+const error = (new URLSearchParams(window.location.search)).get('error');
 
 new Vue({
   el: '#login-section',

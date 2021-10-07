@@ -62,6 +62,14 @@ class MemberController
     return array_map([$this, 'load_fav_boardgames'], $favs);
   }
 
+  #[RequestMapping(value: '/user-role', method: RequestMethod::GET)]
+  function get_role()
+  {
+    $role = new \stdClass();
+    $role->role = isset($_SESSION['USER']) ? $_SESSION['USER']->get_authority() : 'ANONYMOUS';
+    return $role;
+  }
+
   private function load_fav_boardgames($fav)
   {
     return $this->boardgame_service->get_boardgame($fav->get_bid());

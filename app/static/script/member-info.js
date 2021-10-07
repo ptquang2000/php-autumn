@@ -3,12 +3,14 @@ axios.all([
   axios.get(`/favourite`),
   axios.get(`/member`),
   axios.get(`/member/img`),
-]).then(axios.spread((res1, res2, res3, res4)=>{
+  axios.get('user-role'),
+]).then(axios.spread((res1, res2, res3, res4, res5)=>{
 var boardgames = res1.data ? res1.data : []
 var fav = res2.data ? res2.data : []
 var member = res3.data instanceof Object ? res3.data : false
 var image = res4.data
 var error = (new URLSearchParams(window.location.search)).get('error')
+var role = res5.data
 
 new Vue(
   {

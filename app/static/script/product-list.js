@@ -5,7 +5,7 @@ axios.all([
 ]).then(axios.spread((res1, res2, res3)=>{
 
 var boardgames = res1.data
-var fav = res2.data ? res2.data : []
+var fav = res2.data && res2.dat instanceof Array ? res2.data : []
 var member = res3.data instanceof Object ? res3.data.mid : false
 
 new Vue(
@@ -20,7 +20,7 @@ new Vue(
   computed:{
     favs() {
       return this.boardgames.map(boardgame => {
-        if (this.fav.filter(fav => fav.bid == boardgame.bid).length == 1) return true
+        if (this.fav && this.fav.filter(fav => fav.bid == boardgame.bid).length == 1) return true
         return false
       })
     }
@@ -33,6 +33,7 @@ new Vue(
     {
       var regex = new RegExp(`${key}=[^&]*`)
       var params = window.location.search.substring(1)
+      if (!params) return `${key}=${value}`;
       var new_params = params.replace(regex, `${key}=${value}`)
       return params == new_params ? params + `&${key}=${value}` : new_params
     },

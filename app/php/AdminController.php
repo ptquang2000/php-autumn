@@ -15,6 +15,8 @@ class AdminController
   private FavouriteService $favourite_service;
   #[Autowired]
   private CommentService $comment_service;
+  #[Autowired]
+  private MyUserDetailsService $userdetails_service;
 
   #[RequestMapping(value: '/member-list', method: RequestMethod::GET)]
   #[EnableSecurity(role: ['ADMIN'])]
@@ -27,6 +29,7 @@ class AdminController
   #[EnableSecurity(role: ['ADMIN'])]
   function get_member_info_admin($mid)
   {
+    if (!$this->member_service->get_member($mid)) throw new HttpException('404');
     return 'member-info.php';
   }
 

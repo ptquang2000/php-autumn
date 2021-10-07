@@ -1,7 +1,7 @@
 <?php include __TEMPLATE__.'html\\head.html'?>
 <?php include __TEMPLATE__.'html\\navbar.php'?>
 
-<section id="main-container" class="m-5">
+<section id="main-container" class="m-5" v-cloak>
   <!-- Admin -->
   <div v-if="role=='ADMIN'" class="container-lg">
     <form method="POST" enctype="multipart/form-data" class="form-inline row justify-content-center align-items-center">
@@ -90,7 +90,7 @@
   </div>
 </section>
 
-<section id="comments-container">
+<section id="comments-container" v-cloak>
   <div class="container-lg bg-light p-4">
 
     <!-- Admin -->

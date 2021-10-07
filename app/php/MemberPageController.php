@@ -71,25 +71,6 @@ class MemberPageController
     return 'Location: /member-info';
   }
 
-  #[RequestMapping(value: '/member/img', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
-  public function get_member_image()
-  {
-    if ($_SESSION['USER']->get_authority() == 'ADMIN')
-    {
-      $url = $_SERVER['HTTP_REFERER'];
-      $parts = explode('/', $url);
-      $mid = $parts[array_key_last($parts)];
-      $img = $this->member_service->get_member($mid)->get_img();
-      if (file_exists(__IMAGE__.$img) && !empty($img))
-        return base64_encode((file_get_contents(__IMAGE__.$img)));
-    }
-    $mid = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0]->get_mid();
-    $img = $this->member_service->get_member($mid)->get_img();
-    if (file_exists(__IMAGE__.$img) && !empty($img))
-      return base64_encode((file_get_contents(__IMAGE__.$img)));
-  }
-
 }
 
 ?>

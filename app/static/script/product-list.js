@@ -8,7 +8,7 @@ axios.all([
 var boardgames = res1.data
 var fav = res2.data && res2.dat instanceof Array ? res2.data : []
 var member = res3.data instanceof Object ? res3.data.mid : false
-var role = res4.data
+var role = res4.data.role
 
 new Vue(
 {

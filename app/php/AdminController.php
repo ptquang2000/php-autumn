@@ -22,7 +22,7 @@ class AdminController
   #[EnableSecurity(role: ['ADMIN'])]
   function get_list_user()
   {
-    return 'member-list.php';
+    return 'member-list.html';
   }
 
   #[RequestMapping(value: '/member-info/$mid', method: RequestMethod::GET)]
@@ -30,7 +30,7 @@ class AdminController
   function get_member_info_admin($mid)
   {
     if (!$this->member_service->get_member($mid)) throw new HttpException('404');
-    return 'member-info.php';
+    return 'member-info.html';
   }
 
   #[RequestMapping(value: '/delete-member', method: RequestMethod::POST)]

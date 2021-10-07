@@ -12,7 +12,7 @@ var boardgame = res1.data
 var fav = res2.data instanceof Object ? res2.data : false
 var member = res3.data instanceof Object ? res3.data.mid : false
 var comments = res4.data
-var role = res5.data
+var role = res5.data.role
 
 new Vue(
   {

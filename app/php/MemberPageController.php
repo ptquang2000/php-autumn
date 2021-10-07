@@ -1,13 +1,15 @@
 <?php
 
 namespace App\PHP;
-use Core\{Controller, RequestMapping, RequestMethod, EnableSecurity, Autowired, Model};
+use Core\{Controller, RequestMapping, RequestMethod, EnableSecurity, Autowired};
 
 #[Controller]
 class MemberPageController
 {
   #[Autowired]
   private MemberService $member_service; 
+  #[Autowired]
+  private MyUserDetailsService $userdetails_service; 
 
   #[RequestMapping(value: '/member-info', method: RequestMethod::GET)]
   #[EnableSecurity(role: ['MEMBER', 'ADMIN'])]
@@ -16,6 +18,26 @@ class MemberPageController
     if ($_SESSION['USER']->get_authority() == 'ADMIN')
       return 'Location: /member-list';
     return 'member-info.php';
+  }
+
+  #[RequestMapping(value: '/save-user', method: RequestMethod::POST)]
+  #[EnableSecurity(role: ['MEMBER', 'ADMIN'])]
+  function post_save_user()
+  {
+    $url = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
+    $user = form_model('User');
+    if ($_SESSION['USER']->get_authority() == 'ADMIN')
+      $this->userdetails_service->save_user($user);
+    if ($_SESSION['USER']->get_authority() == 'MEMBER')
+      try{
+        $this->userdetails_service->save_member($user);
+      }catch (\mysqli_sql_exception $e)
+      {
+        if (preg_match('/^Duplicate entry \'.*\' for key \'username\'$/', $e->getMessage()) == 1)
+          return 'Location: '.$url.'?error=Username has already been used';
+        throw $e;
+      }
+    return 'Location: '.$url;
   }
 
   #[RequestMapping(value: '/save-info', method: RequestMethod::POST)]

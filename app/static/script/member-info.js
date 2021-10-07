@@ -8,6 +8,7 @@ var boardgames = res1.data ? res1.data : []
 var fav = res2.data ? res2.data : []
 var member = res3.data instanceof Object ? res3.data : false
 var image = res4.data
+var error = (new URLSearchParams(window.location.search)).get('error')
 
 new Vue(
   {
@@ -18,6 +19,7 @@ new Vue(
       image: image,
       fav: fav,
       boardgames: boardgames,
+      error: error,
     },
     computed:{
       favs() {

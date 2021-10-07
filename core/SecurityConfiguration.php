@@ -27,8 +27,14 @@ class SecurityConfiguration
   public function logout()
   {
     unset($_SESSION['USER']);
-    $_SESSION['LOGIN-ERROR'] = 'Logout';
-    $url = $GLOBALS['config']['security.logout_redirect'] ?? $_SERVER['HTTP_REFERER'] ?? '/';
+    $url = $GLOBALS['config']['security.logout_redirect'] ?? false;
+    if (!$url)
+    {
+      if (isset($_SERVER['HTTP_REFERER']) && !in_array($_SERVER['HTTP_REFERER'],SecurityConfiguration::$paths))
+        $url = $_SERVER['HTTP_REFERER'];
+      else $url = ($GLOBALS['config']['security.login'] ?? '/login').'?error=logout';
+    }
+
     header('Location: '.$url);
     exit();
   }
@@ -47,8 +53,7 @@ class SecurityConfiguration
     }catch (UserDetailsException $e)
     {
       unset($_SESSION['USER']);
-      $_SESSION['LOGIN-ERROR'] = $e->getMessage();
-      header('Location: '.$GLOBALS['config']['security.login'] ?? '/login');
+      header('Location: '.($GLOBALS['config']['security.login'] ?? '/login').'?error='.$e->getMessage());
     }
     exit();
   }
@@ -68,7 +73,6 @@ class SecurityConfiguration
       {
         if ($path == $GLOBALS['config']['security.login'] ?? '/login')
           $_SESSION['CURRENT_URL'] = $_SERVER['HTTP_REFERER'] ?? $_SERVER['REQUEST_URI'];
-        else unset($_SESSION['LOGIN_ERROR']);
       }
       return true;
     }
@@ -93,11 +97,9 @@ class SecurityConfiguration
       {
         unset($_SESSION['USER']);
         $_SESSION['CURRENT_URL'] = Router::$url;
-        $_SESSION['LOGIN-ERROR'] = $e->getMessage();
-        header('Location: '.$GLOBALS['config']['security.login'] ?? '/login');
+        header('Location: '.($GLOBALS['config']['security.login'] ?? '/login').'?error='.$e->getMessage());
         exit();
       }
-      unset($_SESSION['LOGIN-ERROR']);
       unset($_SESSION['CURRENT_URL']);
       return true;
     }

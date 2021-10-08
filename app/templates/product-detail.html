@@ -5,7 +5,7 @@
       <input name="bid" class="d-none" v-bind:value="boardgame.bid"/>
       <input name="img" class="d-none" v-bind:value="boardgame.img"/>
       <div class="col-md-6 text-center">
-        <img class="img-fluid" v-bind:src="'img/' + boardgame.img"/>
+        <img class="img-fluid" width="50%" v-bind:src="'img/' + boardgame.img"/>
       </div>
       <div class="col-md-6 justify-content-center">
         <label for="name" class="form-label">Name</label>
@@ -32,7 +32,14 @@
           <input class="form-control" name="time_min" v-bind:value="boardgame.time_min"/>
         </div>
         <label for="" class="form-label">Level</label>
-        <input class="form-control" name="level" v-bind:value="boardgame.level"/>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-star-fill"></i></span>
+          <select name="level" class="form-select" v-model="boardgame.level">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
         <label for="" class="form-label">Price</label>
         <input class="form-control" name="price" v-bind:value="boardgame.price"/>
         <label for="image-file" class="form-label">File</label>

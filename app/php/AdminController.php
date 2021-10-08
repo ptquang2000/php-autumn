@@ -1,7 +1,7 @@
 <?php
 
 namespace App\PHP;
-use Core\{Controller, RequestMapping, RequestMethod, Model, Autowired, EnableSecurity, HttpException};
+use Core\{Controller, RequestMapping, RequestMethod, Autowired, EnableSecurity, HttpException};
 use GdImage;
 
 #[Controller]
@@ -23,6 +23,13 @@ class AdminController
   function get_list_user()
   {
     return 'member-list.html';
+  }
+
+  #[RequestMapping(value: '/product-add', method: RequestMethod::GET)]
+  #[EnableSecurity(role: ['ADMIN'])]
+  function get_product_add()
+  {
+    return 'product-add.html';
   }
 
   #[RequestMapping(value: '/member-info/$mid', method: RequestMethod::GET)]

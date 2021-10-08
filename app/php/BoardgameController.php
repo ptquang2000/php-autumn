@@ -27,6 +27,30 @@ class BoardgameController
     else 
       return $this->boardgame_service->get_all_boardgames($alph, $price, $level);
   }
+  #[RequestMapping(value: '/save-boardgame', method: RequestMethod::POST)]
+  #[EnableSecurity(role:['ADMIN'])]
+  public function post_save_boardgames()
+  {
+    $obj = new \stdClass();
+    $obj->error = false;
+    $boardgame = form_model('Boardgame');
+    try{
+      if (is_uploaded_file($_FILES['image']['tmp_name']) &&
+      getimagesize($_FILES['image']['tmp_name']))
+      {
+        $obj = $this->boardgame_service->save_boardgame($boardgame);
+        $file_type = '.'.pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $file_name = $obj->get_bid().$file_type;
+        $obj->set_img($file_name);
+        $obj = $this->boardgame_service->save_boardgame($obj);
+        move_uploaded_file($_FILES['image']['tmp_name'], __STATIC__.'img'.DL.$file_name);
+      }else throw new \Exception('Missing boardgame image');
+    }catch (\Exception $e)
+    {
+      $obj->error = $e->getMessage();
+    }
+    return $obj;
+  }
 }
 
 ?>

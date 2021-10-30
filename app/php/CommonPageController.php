@@ -42,6 +42,7 @@ class CommonPageController
 
     $comments = $this->comment_service->get_comment_by_bid($id);
     $comments = array_map([$this, 'match_member_comment'], $comments);
+    
     $model->add_attribute('comments', $comments);
 
     if (isset($_SESSION['USER']))
@@ -53,12 +54,14 @@ class CommonPageController
       if ($fid)
         $model->add_attribute('fid', $fid);
     }
+    
     return 'product-detail.html';
   }
 
   private function match_member_comment($comment)
   {
     return [
+      'mid' => $comment->get_mid(),
       'cid' => $comment->get_cid(),
       'username'=>$this->member_service->get_member($comment->get_mid())->get_user()->get_username(),
       'content'=>$comment->get_content()

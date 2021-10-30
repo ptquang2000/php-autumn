@@ -100,7 +100,7 @@
     <!-- Admin -->
     <div v-if="role=='ADMIN'" class="row justify-content-center">
       <div class="col-8">
-        <form method="POST" v-for="(comment, idx) in comments">
+        <form method="POST" @submit.prevent v-for="(comment, idx) in comments">
           <input type="text" class="d-none" name="cid" v-model="comments[idx].cid"/>
           <label for="content" class="lead fw-bold form-label ms-2">{{comment.username}}</label>
           <div class="input-group">

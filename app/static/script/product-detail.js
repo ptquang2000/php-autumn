@@ -7,7 +7,6 @@ axios.all([
   axios.get(`/comment/${bid}`),
   axios.get('user-role'),
 ]).then(axios.spread((res1, res2, res3, res4, res5)=>{
-
 var boardgame = res1.data
 var fav = res2.data instanceof Object ? res2.data : false
 var member = res3.data instanceof Object ? res3.data.mid : false
@@ -89,17 +88,19 @@ new Vue(
         })
       },
       edit_comment: function(e, idx){
+        
         e.preventDefault()
         axios.post("/edit-comment", Qs.stringify({
           cid: this.comments[idx].cid,
           bid: this.boardgame.bid,
-          mid: this.member,
+          mid: this.comments[idx].mid,
           content: this.comments[idx].content
         }),{
           headers:{
             "Content-Type": "application/x-www-form-urlencoded",
           }
         }).then(function (response) {
+          console.log(response.data)
           return response.data
         }).then(comments => {
           this.comments = comments
@@ -110,7 +111,7 @@ new Vue(
         axios.post("/delete-comment", Qs.stringify({
           cid: this.comments[idx].cid,
           bid: this.boardgame.bid,
-          mid: this.member,
+          mid: this.comments[idx].mid,
           content: this.comments[idx].content
         }),{
           headers:{"Content-Type": "application/x-www-form-urlencoded",}

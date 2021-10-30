@@ -22,11 +22,20 @@ class MyUserDetailsService implements UserDetailsService
     $user->set_role('ROLE_MEMBER');
     $user->set_uid($_SESSION['USER']->get_uid());
     $user->set_password(password_hash($user->get_password(), PASSWORD_DEFAULT));
+
     return $this->user_repository->save($user);
   }
   public function save_user(User $user)
   {
     $user->set_password($this->user_repository->find_by_id($user->get_uid())->get_password());
+    return $this->user_repository->save($user);
+  }
+  public function new_user(User $user)
+  {
+    $user->set_role('ROLE_MEMBER');
+
+    $user->set_password(password_hash($user->get_password(), PASSWORD_DEFAULT));
+
     return $this->user_repository->save($user);
   }
   public function delete_user($id)

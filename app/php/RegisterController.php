@@ -23,7 +23,7 @@ class RegisterController
     $user = form_model('User');
     $member = form_model('Member');
     try{
-      $user = $this->usedetails_service->save_user($user);
+      $user = $this->usedetails_service->new_user($user);
     }catch (\mysqli_sql_exception $e)
     {
       if (preg_match('/^Duplicate entry \'.*\' for key \'username\'$/', $e->getMessage()) == 1)

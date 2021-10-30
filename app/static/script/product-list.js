@@ -6,7 +6,7 @@ axios.all([
 ]).then(axios.spread((res1, res2, res3, res4)=>{
 
 var boardgames = res1.data
-var fav = res2.data && res2.dat instanceof Array ? res2.data : []
+var fav = res2.data && res2.data instanceof Array ? res2.data : []
 var member = res3.data instanceof Object ? res3.data.mid : false
 var role = res4.data.role
 

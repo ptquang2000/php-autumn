@@ -1,3 +1,4 @@
+
 axios.all([
   axios.get(`/member/boardgames`),
   axios.get(`/favourite`),
@@ -11,6 +12,7 @@ var member = res3.data instanceof Object ? res3.data : false
 var image = res4.data.image
 var error = (new URLSearchParams(window.location.search)).get('error')
 var role = res5.data.role
+
 
 new Vue(
   {
@@ -35,6 +37,26 @@ new Vue(
       redirect: function(id){
         window.location.href = `/product-detail?id=${id}`
       },
+      func_swap_img: function(event){
+          const [file] = event.target.files
+          if (file != null) {
+            document.getElementById('preview-img').src = URL.createObjectURL(file)
+          }
+      },
+      drop_img: function(event){
+          event.preventDefault()
+          const [file] = event.dataTransfer.files
+          // console.log(file)
+          if (file != null) {
+            document.getElementById('preview-img').src = URL.createObjectURL(file)
+            document.getElementById('input-file-now').files = event.dataTransfer.files
+          }
+      },
+      save_member_info: function(){
+        var form = new FormData();
+        form.append('')
+      }
+      ,
       delete_fav: function(idx)
       {
         var fav = this.fav.filter(fav => fav.bid == this.boardgames[idx].bid)[0]
@@ -55,3 +77,5 @@ new Vue(
   }
 )
 }))
+
+

@@ -29,9 +29,13 @@
       <!-- Profile -->
       <div class="tab-pane fade show active container" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
         <form  method="POST" enctype="multipart/form-data" class="row p-3 align-items-center justify-content-center bg-light gy-3">
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <img v-bind:src="'data:image/png;base64,'+image" alt="avatar" class="img-fluid">
-            <input type="file" name="image-file" class="form-control mt-2"/>
+          <div @drop="drop_img($event)" @dragenter.prevent @dragover.prevent class="col-lg-3 col-md-6 col-sm-6 file-upload-wrapper" id="drop_img">
+
+            <img v-bind:src="'data:image/png;base64,'+image" alt="avatar" class="img-fluid" id="preview-img">
+            <input @change="func_swap_img($event)" type="file" name="image-file" id="input-file-now" class="form-control mt-2 file-upload"/>
+
+            
+
           </div>
           <div class="col-lg-4 col-md-6 col-sm-6">
               <input type="text" v-if="role=='ADMIN'" v-show="false" name='mid' v-bind:value="member.mid">

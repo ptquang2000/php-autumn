@@ -40,38 +40,37 @@
 
               <label for="name" class="form-label">Name</label>
               <div class="input-group">
+                
+                <input type="text" class="form-control" name='name' v-bind:value="member.name">
                 <span class="input-group-text">
                   <i class="bi bi-card-text"></i>
                 </span>
-                <input type="text" class="form-control" name='name' v-bind:value="member.name">
               </div>
               <label for="email" class="form-label">Email</label>
               <div class="input-group">
+                
+                <input type="text" class="form-control" name='email' v-bind:value="member.email">
                 <span class="input-group-text">
                   <i class="bi bi-at"></i>
                 </span>
-                <input type="text" class="form-control" name='email' v-bind:value="member.email">
               </div>
               <label for="phone" class="form-label">Phone</label>
               <div class="input-group">
+                <input type="text" class="form-control" name='phone' v-bind:value="member.phone">
                 <span class="input-group-text">
                   <i class="bi bi-phone"></i>
                 </span>
-                <input type="text" class="form-control" name='phone' v-bind:value="member.phone">
               </div>
               <label for="address" class="form-label">Address</label>
               <div class="input-group">
+                <input type="text" class="form-control" name='address' v-bind:value="member.address">
                 <span class="input-group-text">
                   <i class="bi bi-geo-alt-fill"></i>
                 </span>
-                <input type="text" class="form-control" name='address' v-bind:value="member.address">
               </div>
               <label for="birth" class="form-label">Birthday</label>
-              <div class="input-group">
-                <span class="input-group-text">
-                  <i class="bi bi-calendar4"></i>
-                </span>
-                <input type="text" class="form-control" name='birth' v-bind:value="member.birth">
+              <div class="input-group" id="calendar-icon">
+                <input type="date" class="form-control" name='birth' v-bind:value="member.birth">
               </div>
               <div class="text-center m-3">
                 <button type="submit" class="btn btn-primary" formaction="/save-info">

@@ -45,6 +45,7 @@ class MemberPageController
   function post_save_info()
   {
     $member = form_model('Member');
+    
     if ($_SESSION['USER']->get_authority() == 'MEMBER')
     {
       $uid = $_SESSION['USER']->get_uid();

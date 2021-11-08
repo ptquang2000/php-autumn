@@ -15,7 +15,7 @@ class MemberController
   private FavouriteService $favourite_service; 
 
   #[RequestMapping(value: '/member', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
+  #[EnableSecurity(role:['MEMBER', 'ADMIN', 'BANISHED'])]
   public function get_member_id()
   {
     if ($_SESSION['USER']->get_authority() == 'ADMIN')
@@ -42,11 +42,12 @@ class MemberController
     $obj->username = $member->get_user()->get_username();
     $obj->email = $member->get_email();
     $obj->phone = $member->get_phone();
+    $obj->role = $member->get_user()->get_role();
     return $obj;
   }
 
   #[RequestMapping(value: '/member/boardgames', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
+  #[EnableSecurity(role:['MEMBER', 'ADMIN', 'BANISHED'])]
   public function get_member_fav()
   {
     if ($_SESSION['USER']->get_authority() == 'ADMIN')
@@ -76,7 +77,7 @@ class MemberController
   }
 
   #[RequestMapping(value: '/member/img', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
+  #[EnableSecurity(role:['MEMBER', 'ADMIN', 'BANISHED'])]
   public function get_member_image()
   {
     $obj = new \stdClass();

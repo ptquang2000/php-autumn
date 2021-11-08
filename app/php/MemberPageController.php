@@ -12,7 +12,7 @@ class MemberPageController
   private MyUserDetailsService $userdetails_service; 
 
   #[RequestMapping(value: '/member-info', method: RequestMethod::GET)]
-  #[EnableSecurity(role: ['MEMBER', 'ADMIN'])]
+  #[EnableSecurity(role: ['MEMBER', 'ADMIN', 'BANISHED'])]
   function get_member_info()
   {
     if ($_SESSION['USER']->get_authority() == 'ADMIN')
@@ -21,7 +21,7 @@ class MemberPageController
   }
 
   #[RequestMapping(value: '/save-user', method: RequestMethod::POST)]
-  #[EnableSecurity(role: ['MEMBER', 'ADMIN'])]
+  #[EnableSecurity(role: ['MEMBER', 'ADMIN', 'BANISHED'])]
   function post_save_user()
   {
     $url = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
@@ -41,7 +41,7 @@ class MemberPageController
   }
 
   #[RequestMapping(value: '/save-info', method: RequestMethod::POST)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
+  #[EnableSecurity(role:['MEMBER', 'ADMIN', 'BANISHED'])]
   function post_save_info()
   {
     $member = form_model('Member');

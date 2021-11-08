@@ -36,7 +36,9 @@ class AdminController
   #[EnableSecurity(role: ['ADMIN'])]
   function get_member_info_admin($mid)
   {
+
     if (!$this->member_service->get_member($mid)) throw new HttpException('404');
+    
     return 'member-info.html';
   }
 

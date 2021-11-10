@@ -2,7 +2,7 @@
 
 namespace App\PHP;
 
-use Core\{RestController, RequestMapping, RequestMethod, Autowired, EnableSecurity};
+use Core\{RestController, RequestMapping, RequestMethod, Autowired};
 
 #[RestController]
 class BoardgameController 
@@ -28,7 +28,6 @@ class BoardgameController
       return $this->boardgame_service->get_all_boardgames($alph, $price, $level);
   }
   #[RequestMapping(value: '/save-boardgame', method: RequestMethod::POST)]
-  #[EnableSecurity(role:['ADMIN'])]
   public function post_save_boardgames()
   {
     $obj = new \stdClass();

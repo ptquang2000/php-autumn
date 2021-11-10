@@ -1,7 +1,7 @@
 <?php
 
 namespace App\PHP;
-use Core\{Controller, RequestMapping, RequestMethod, Autowired, EnableSecurity, HttpException};
+use Core\{Controller, RequestMapping, RequestMethod, Autowired, HttpException};
 use GdImage;
 
 #[Controller]
@@ -19,21 +19,18 @@ class AdminController
   private MyUserDetailsService $userdetails_service;
 
   #[RequestMapping(value: '/member-list', method: RequestMethod::GET)]
-  #[EnableSecurity(role: ['ADMIN'])]
   function get_list_user()
   {
     return 'member-list.html';
   }
 
   #[RequestMapping(value: '/product-add', method: RequestMethod::GET)]
-  #[EnableSecurity(role: ['ADMIN'])]
   function get_product_add()
   {
     return 'product-add.html';
   }
 
   #[RequestMapping(value: '/member-info/$mid', method: RequestMethod::GET)]
-  #[EnableSecurity(role: ['ADMIN'])]
   function get_member_info_admin($mid)
   {
 
@@ -43,7 +40,6 @@ class AdminController
   }
 
   #[RequestMapping(value: '/delete-member', method: RequestMethod::POST)]
-  #[EnableSecurity(role: ['ADMIN'])]
   function post_delete_member()
   {
     $member = form_model('Member');
@@ -53,7 +49,6 @@ class AdminController
   }
 
   #[RequestMapping(value: '/edit-product', method: RequestMethod::POST)]
-  #[EnableSecurity(role: ['ADMIN'])]
   function post_edit_product()
   {
     $boardgame = form_model('Boardgame');
@@ -72,7 +67,6 @@ class AdminController
   }
 
   #[RequestMapping(value: '/delete-product', method: RequestMethod::POST)]
-  #[EnableSecurity(role: ['ADMIN'])]
   function post_delete_product()
   {
     $boardgame = form_model('Boardgame');

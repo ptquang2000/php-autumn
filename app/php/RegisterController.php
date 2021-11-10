@@ -1,7 +1,7 @@
 <?php
 
 namespace App\PHP;
-use Core\{Controller, RequestMapping, RequestMethod, Autowired, Model};
+use Core\{Controller, RequestMapping, RequestMethod, Autowired};
 
 #[Controller]
 class RegisterController

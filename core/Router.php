@@ -12,9 +12,9 @@ class Router
 	public static $url;
 	public static $path;
 	public static $paths = array();
+	public static $type;
 	private static $controller;
 	private static $df_parts=array();
-	private static $type;
 	private static $security;
 
 	public static function setup($filename)
@@ -24,12 +24,32 @@ class Router
 		$reflection = new ReflectionClass($class);
 		$attributes = $reflection->getAttributes();
 
-		if (!interface_exists($class) && 
-		isset($reflection->getInterfaceNames()[0]) &&
-		$reflection->getInterfaceNames()[0] == 'Core\UserDetailsService')
+		if (is_subclass_of($class, 'Core\SecurityConfiguration'))
 		{
-			Router::$security = new SecurityConfiguration();
-			Router::$security->set_userdetails_service($reflection->newInstance());
+			$security = new $class();
+			array_map(
+				function ($className) use($security) {
+					$className = str_replace('app/php/', 'App\\PHP\\',
+					str_replace('.php', '', $className));
+					if (in_array('Core\\UserDetailsService', class_implements($className)))
+						$security->set_userdetails_service(new $className());
+				},
+				glob("app/php/*.php")
+			);
+			$securityRef = new ReflectionClass($security);
+			array_map(
+				function ($attr) use ($security) {
+					if ($attr->getName() == 'Core\EnableSecurity')
+						$security->set_enable(true);
+				},$securityRef->getAttributes());
+			
+			if ($security->is_enable())
+			{
+				$http = new HttpSecurity();
+				$security->httpConfigure($http);
+				$security->http_security = $http;
+			}
+			Router::$security = $security;
 		}
 
 		if (!$attributes || ($attributes[0]->getName() != 'Core\Controller'
@@ -86,11 +106,6 @@ class Router
 					'"\'s method "'.
 					Router::$paths[$attr_args['value']]['class_method'].
 					'"');
-			
-			if (isset($method->getAttributes()[1]))
-			{
-				SecurityConfiguration::$paths[$attr_args['value']] = $method->getAttributes()[1]->getArguments()['role'];
-			}
 			
 			Router::$paths[$attr_args['value']] = [
 				'method'=> $attr_args['method'] ?? RequestMethod::GET,
@@ -201,13 +216,13 @@ class Router
 				[$object]);
 		}
 		// call url handle
-		if (isset(Router::$security)) Router::$security->authorize(Router::$path);
+		if (isset(Router::$security) && Router::$security->is_enable()) Router::$security->authorize(Router::$path);
 
 		$result = Router::$controller->{Router::$paths[Router::$path]['class_method']}
 			(...Router::$df_parts);
-		if ($type == 'Core\RestControllerTrait')
+		if (Router::$type == 'Core\RestControllerTrait')
 			echo RestControllerTrait::encode($result);
-		else if ($type == 'Core\ControllerTrait')
+		else if (Router::$type == 'Core\ControllerTrait')
 			Router::$controller->init_view($result)->render();	
 	}
 }

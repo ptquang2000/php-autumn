@@ -3,10 +3,9 @@
 namespace Core;
 
 use Attribute;
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_CLASS)]
 class EnableSecurity 
 {
-  public function __construct(public $role){}
 }
 #[Attribute(Attribute::TARGET_CLASS)]
 class Service {}

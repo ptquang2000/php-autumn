@@ -25,6 +25,11 @@ new Vue(
       boardgames: boardgames,
       error: error,
     },
+    mounted(){
+      if (this.error != null)
+        document.querySelector('#v-pills-account-tab').click()
+
+    },
     computed:{
       favs() {
         return this.boardgames.map(boardgame => {

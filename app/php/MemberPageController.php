@@ -24,18 +24,33 @@ class MemberPageController
   {
     $url = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
     $user = form_model('User');
+
     if ($_SESSION['USER']->get_authority() == 'ADMIN')
       $this->userdetails_service->save_user($user);
-    if ($_SESSION['USER']->get_authority() == 'MEMBER')
+    if ($_SESSION['USER']->get_authority() == 'MEMBER'){
+      if (! password_verify(htmlspecialchars_decode($_POST['old_password']), $_SESSION['USER']->get_password())){
+        return 'Location: '.$url.'?error=Wrong old password';
+      }
+
+      if (htmlspecialchars_decode($_POST['password']) != htmlspecialchars_decode($_POST['retype_password'])){
+        return 'Location: '.$url.'?error=Password mismatched';
+      }
+
       try{
         $this->userdetails_service->save_member($user);
+        $user = $this->userdetails_service->load_user_by_username($_SESSION['USER']->get_username());
+        if ($user)
+          $_SESSION['USER'] = $user;
       }catch (\mysqli_sql_exception $e)
       {
         if (preg_match('/^Duplicate entry \'.*\' for key \'username\'$/', $e->getMessage()) == 1)
           return 'Location: '.$url.'?error=Username has already been used';
         throw $e;
       }
-    return 'Location: '.$url;
+    }
+    
+
+    return 'Location: '.$url.'?error=Password changed successfully!!';
   }
 
   #[RequestMapping(value: '/save-info', method: RequestMethod::POST)]

@@ -68,10 +68,10 @@ class CommonPageController
     ];
   }
 
-  #[RequestMapping(value: '/news', method: RequestMethod::GET)]
-  function get_news()
+  #[RequestMapping(value: '/news/$name', method: RequestMethod::GET)]
+  function get_news($name)
   {
-    return 'news.html';
+    return "newspaper/$name.html";
   }
 }
 

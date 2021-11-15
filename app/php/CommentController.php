@@ -2,7 +2,7 @@
 
 namespace App\PHP;
 
-use Core\{RestController, RequestMapping, RequestMethod, Autowired, EnableSecurity};
+use Core\{RestController, RequestMapping, RequestMethod, Autowired};
 
 #[RestController]
 class CommentController 
@@ -21,7 +21,6 @@ class CommentController
   }
 
   #[RequestMapping(value: '/add-comment', method: RequestMethod::POST)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
   public function post_save_comment()
   {
     $new_comment = form_model('Comment');
@@ -37,7 +36,6 @@ class CommentController
   }
 
   #[RequestMapping(value: '/edit-comment', method: RequestMethod::POST)]
-  #[EnableSecurity(role: ['ADMIN'])]
   public function post_edit_comment()
   {
     $edited_cmt = form_model('Comment');
@@ -47,7 +45,6 @@ class CommentController
   }
   
   #[RequestMapping(value: '/delete-comment', method: RequestMethod::POST)]
-  #[EnableSecurity(role: ['ADMIN'])]
   function post_delete_comment()
   {
     $deleted_cmt = form_model('Comment');

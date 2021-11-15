@@ -2,11 +2,29 @@
 
 namespace Core;
 
+use Core\HttpSecurity;
+
 class SecurityConfiguration
 {
-  public static $paths = array();
+  public HttpSecurity $http_security;
 
+  private $enable = false;
   private $userdetails_service;
+
+  public function is_enable()
+  {
+    return $this->enable;
+  }
+
+  public function set_enable($enable)
+  {
+    $this->enable = $enable;
+  }
+
+  public function httpConfigure(HttpSecurity $http){
+    foreach(Router::$paths as $path=>$prop)
+      $http->authorizeRequest()->antMatchers($prop['method'] ,$path);
+  }
 
   public function set_userdetails_service($userdetails_service)
   {
@@ -30,7 +48,7 @@ class SecurityConfiguration
     $url = $GLOBALS['config']['security.logout_redirect'] ?? false;
     if (!$url)
     {
-      if (isset($_SERVER['HTTP_REFERER']) && !in_array($_SERVER['HTTP_REFERER'],SecurityConfiguration::$paths))
+      if (isset($_SERVER['HTTP_REFERER']) && !$this->is_authorized_path($_SERVER['HTTP_REFERER']))
         $url = $_SERVER['HTTP_REFERER'];
       else $url = ($GLOBALS['config']['security.login'] ?? '/login').'?error=logout';
     }
@@ -58,9 +76,27 @@ class SecurityConfiguration
     exit();
   }
 
+  public function is_authorized_path($path)
+  {
+    return in_array($path,
+      array_map(function($property){
+       return $property['path'];
+    }, $this->http_security->antMatchers->property));
+  }
+
+  public function get_path_authority($path)
+  {
+    $result = array_filter($this->http_security->antMatchers->property,
+        function($property) use ($path) {
+          return $property['path'] == $path;
+    });
+    return $result[array_key_first($result)]['role'];
+  }
+
   public function authorize($path)
   {
-    if (!array_key_exists($path, SecurityConfiguration::$paths))
+    $check_auth_path = $this->is_authorized_path($path);
+    if (!$check_auth_path)
     {
       if (isset($_SESSION['USER']) && $path == $GLOBALS['config']['security.login'] ?? '/login')
       {
@@ -81,11 +117,9 @@ class SecurityConfiguration
       try
       {
         $user = $_SESSION['USER'];
-        if (isset(SecurityConfiguration::$paths[$path]))
+        if ($check_auth_path && !in_array( $user->get_authority(), $this->get_path_authority($path) ))
         {
-          $roles = SecurityConfiguration::$paths[$path];
-          if(!in_array($user->get_authority(), $roles))
-            throw new HttpException('403');
+          throw new HttpException('403');
         }
         if (!$user->is_account_expired())
           throw new UserDetailsException('AccountExpired');

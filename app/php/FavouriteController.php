@@ -2,7 +2,7 @@
 
 namespace App\PHP;
 
-use Core\{RestController, RequestMapping, RequestMethod, Autowired, EnableSecurity};
+use Core\{RestController, RequestMapping, RequestMethod, Autowired};
 
 #[RestController]
 class FavouriteController 
@@ -13,7 +13,6 @@ class FavouriteController
   private MemberService $member_service; 
 
   #[RequestMapping(value: '/favourite', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
   public function get_favourites()
   {
     $mid = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0]->get_mid();
@@ -21,7 +20,6 @@ class FavouriteController
   }
 
   #[RequestMapping(value: '/favourite/$bid', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER'])]
   public function get_favourite($bid)
   {
     $mid = $this->member_service->get_member_by_uid($_SESSION['USER']->get_uid())[0]->get_mid();
@@ -29,7 +27,6 @@ class FavouriteController
   }
 
   #[RequestMapping(value: '/add-favourite', method: RequestMethod::POST)]
-  #[EnableSecurity(role:['MEMBER'])]
   function post_add_favourite()
   {
     $new_favourite = form_model('Favourite');
@@ -40,7 +37,6 @@ class FavouriteController
   }
 
   #[RequestMapping(value: '/delete-favourite', method: RequestMethod::POST)]
-  #[EnableSecurity(role:['MEMBER'])]
   function post_delete_favourite()
   {
     $deleted_favourite = form_model('Favourite');

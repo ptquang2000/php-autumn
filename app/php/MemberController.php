@@ -2,7 +2,7 @@
 
 namespace App\PHP;
 
-use Core\{RestController, RequestMapping, RequestMethod, Autowired, EnableSecurity};
+use Core\{RestController, RequestMapping, RequestMethod, Autowired};
 
 #[RestController]
 class MemberController 
@@ -15,7 +15,6 @@ class MemberController
   private FavouriteService $favourite_service; 
 
   #[RequestMapping(value: '/member', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
   public function get_member_id()
   {
     if ($_SESSION['USER']->get_authority() == 'ADMIN')
@@ -29,7 +28,6 @@ class MemberController
   }
 
   #[RequestMapping(value: '/members', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['ADMIN'])]
   public function get_members()
   {
     return array_map([$this, 'load_username'],$this->member_service->get_all_members());
@@ -42,11 +40,11 @@ class MemberController
     $obj->username = $member->get_user()->get_username();
     $obj->email = $member->get_email();
     $obj->phone = $member->get_phone();
+    $obj->role = $member->get_user()->get_role();
     return $obj;
   }
 
   #[RequestMapping(value: '/member/boardgames', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
   public function get_member_fav()
   {
     if ($_SESSION['USER']->get_authority() == 'ADMIN')
@@ -76,7 +74,6 @@ class MemberController
   }
 
   #[RequestMapping(value: '/member/img', method: RequestMethod::GET)]
-  #[EnableSecurity(role:['MEMBER', 'ADMIN'])]
   public function get_member_image()
   {
     $obj = new \stdClass();

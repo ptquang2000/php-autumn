@@ -9,7 +9,7 @@
       <ul class="navbar-nav">
         <template v-if="login">
           <li class="nav-item">
-            <a v-if="role=='MEMBER'" href="/member-info" class="nav-link">Profile</a>
+            <a v-if="role=='MEMBER' || role=='BANISHED'" href="/member-info" class="nav-link">Profile</a>
             <a v-if="role=='ADMIN'" href="/member-list" class="nav-link">Members</a>
           </li>
           <li class="nav-item">
@@ -32,4 +32,29 @@
   </div>
 </nav>
 
+
+
 <script type="text/javascript" src="/script/navbar.js"></script>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" id="ban-button" style="display: none;" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Notice</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        You have been banned!!!
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

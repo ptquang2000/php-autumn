@@ -13,8 +13,7 @@ new Vue({
     error: '',
   },
   methods: {
-    save_boardgame()
-    {
+    save_boardgame() {
       var form = new FormData();
       form.append('name',this.name)
       form.append('age_max',this.age_max)
@@ -33,6 +32,13 @@ new Vue({
           window.location.href = `/product-detail?id=${data.bid}`  
         this.error = data.error
       })
-    }
+    },
+    drop_img(event){
+      event.preventDefault()
+      const [file] = event.dataTransfer.files
+      if (file != null) {
+        document.getElementById('product_img').files = event.dataTransfer.files
+      }
+    },
   }
 })

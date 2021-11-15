@@ -54,7 +54,15 @@ new Vue(
         }).then(favs => {
           this.fav = favs.filter(fav=>fav.bid==this.boardgame.bid)[0]
         })
-      }
+      },
+      drop_img(event){
+        event.preventDefault()
+        const [file] = event.dataTransfer.files
+        if (file != null) {
+          document.getElementById('product_detail_img').src = URL.createObjectURL(file)
+          document.getElementById('product_detail_input_img').files = event.dataTransfer.files
+        }
+      },
     }
   }
 )

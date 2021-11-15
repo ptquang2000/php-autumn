@@ -4,8 +4,8 @@
     <form method="POST" enctype="multipart/form-data" class="form-inline row justify-content-center align-items-center">
       <input name="bid" class="d-none" v-bind:value="boardgame.bid"/>
       <input name="img" class="d-none" v-bind:value="boardgame.img"/>
-      <div class="col-md-6 text-center">
-        <img class="img-fluid" width="50%" v-bind:src="'img/' + boardgame.img"/>
+      <div @drop="drop_img($event)" @dragenter.prevent @dragover.prevent class="col-md-6 text-center">
+        <img id="product_detail_img" class="img-fluid" width="50%" v-bind:src="'img/' + boardgame.img"/>
       </div>
       <div class="col-md-6 justify-content-center">
         <label for="name" class="form-label">Name</label>
@@ -43,7 +43,7 @@
         <label for="" class="form-label">Price</label>
         <input class="form-control" name="price" v-bind:value="boardgame.price"/>
         <label for="image-file" class="form-label">File</label>
-        <input type="file" name="image-file" class="form-control"/>
+        <input id="product_detail_input_img" type="file" name="image-file" class="form-control"/>
       </div>
       <div class="mb-2 mt-2 text-center">
         <button type="submit" class="btn btn-success" formaction="edit-product">

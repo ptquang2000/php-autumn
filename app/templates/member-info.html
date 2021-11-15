@@ -110,12 +110,29 @@
                 <option value="ROLE_MEMBER">MEMBER</option>
               </select>
             </div>
+
+            <label v-show="role=='MEMBER'" for="password" class="form-label">Old Password</label>
+            <div v-show="role=='MEMBER'" class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-key-fill"></i>
+              </span>
+              <input id="old-pass" type="password" class="form-control" name='password'>
+            </div>
+
             <label v-show="role=='MEMBER'" for="password" class="form-label">Password</label>
             <div v-show="role=='MEMBER'" class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-key-fill"></i>
               </span>
-              <input type="password" class="form-control" name='password'>
+              <input id="new_pass" type="password" class="form-control" name='password'>
+            </div>
+
+            <label v-show="role=='MEMBER'" for="password" class="form-label">Retype Password</label>
+            <div v-show="role=='MEMBER'" class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-key-fill"></i>
+              </span>
+              <input id="retype_pass" type="password" class="form-control" name='password'>
             </div>
             <div class="text-center m-3">
               <button type="submit" class="btn btn-primary" formaction="/save-user">

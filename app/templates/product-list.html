@@ -26,30 +26,22 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <li>
-                <a
-                  class="dropdown-item"
-                  v-bind:href="'/product-list?'+option('price','asc')"
+                <a class="dropdown-item" href="/product-list?price=asc"
                   >Low Price</a
                 >
               </li>
               <li>
-                <a
-                  class="dropdown-item"
-                  v-bind:href="'/product-list?'+option('price','desc')"
+                <a class="dropdown-item" href="/product-list?price=desc"
                   >High Price</a
                 >
               </li>
               <li>
-                <a
-                  class="dropdown-item"
-                  v-bind:href="'/product-list?'+option('name','asc')"
+                <a class="dropdown-item" href="/product-list?name=asc"
                   >Name A-Z</a
                 >
               </li>
               <li>
-                <a
-                  class="dropdown-item"
-                  v-bind:href="'/product-list?'+option('name','desc')"
+                <a class="dropdown-item" href="/product-list?name=desc"
                   >Name Z-A</a
                 >
               </li>

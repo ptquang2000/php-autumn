@@ -34,7 +34,7 @@ class BoardgameController
     $obj->error = false;
     $boardgame = form_model('Boardgame');
     try{
-      if (is_uploaded_file($_FILES['image']['tmp_name']) &&
+      if (isset($_FILES['image']) && is_uploaded_file($_FILES['image']['tmp_name']) &&
       getimagesize($_FILES['image']['tmp_name']))
       {
         $obj = $this->boardgame_service->save_boardgame($boardgame);

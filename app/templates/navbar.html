@@ -7,6 +7,18 @@
     </button>
     <div id="main-nav" class="collapse navbar-collapse justify-content-end align-center">
       <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Contact us
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#">ntkduy@gmail.com</a></li>
+            <li><a class="dropdown-item" href="#">sdt: 1234567890</a></li>
+            <li><a class="dropdown-item" href="#">dia chi: ho da</a></li>
+            <!-- <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li> -->
+          </ul>
+        </li>
         <template v-if="login">
           <li class="nav-item">
             <a v-if="role=='MEMBER' || role=='BANISHED'" href="/member-info" class="nav-link">Profile</a>

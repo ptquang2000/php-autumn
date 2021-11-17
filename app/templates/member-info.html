@@ -16,8 +16,9 @@
         role="tab"
         aria-controls="v-pills-profile"
         aria-selected="true"
+        style="width: 8rem;"
       >
-        Profile
+        Hồ sơ
       </button>
       <button
         class="nav-link"
@@ -28,8 +29,9 @@
         role="tab"
         aria-controls="v-pills-account"
         aria-selected="false"
+        style="width: 8rem;"
       >
-        Account
+        Tài khoản
       </button>
       <button
         class="nav-link"
@@ -40,8 +42,9 @@
         role="tab"
         aria-controls="v-pills-fav"
         aria-selected="false"
+        style="width: 8rem;"
       >
-        Favourite
+        Yêu thích
       </button>
     </div>
     <!-- Tab content -->
@@ -53,7 +56,7 @@
         role="tabpanel"
         aria-labelledby="v-pills-fav-tab"
       >
-        <div class="row mt-5 mb-5 g-5">
+        <div class="row p-5 bg-light">
           <div
             class="card-group col-xl-3 col-lg-4 col-8"
             v-for="(boardgame, idx) in boardgames"
@@ -153,7 +156,7 @@
               v-bind:value="member.img"
             />
 
-            <label for="name" class="form-label">Name</label>
+            <label for="name" class="form-label">Tên</label>
             <div class="input-group">
               <input
                 type="text"
@@ -177,7 +180,7 @@
                 <i class="bi bi-at"></i>
               </span>
             </div>
-            <label for="phone" class="form-label">Phone</label>
+            <label for="phone" class="form-label">Số điện thoại</label>
             <div class="input-group">
               <input
                 type="text"
@@ -189,7 +192,7 @@
                 <i class="bi bi-phone"></i>
               </span>
             </div>
-            <label for="address" class="form-label">Address</label>
+            <label for="address" class="form-label">Địa chỉ</label>
             <div class="input-group">
               <input
                 type="text"
@@ -201,7 +204,7 @@
                 <i class="bi bi-geo-alt-fill"></i>
               </span>
             </div>
-            <label for="birth" class="form-label">Birthday</label>
+            <label for="birth" class="form-label">Ngày sinh</label>
             <div class="input-group" id="calendar-icon">
               <input
                 type="date"
@@ -258,7 +261,7 @@
               v-bind:value="member.uid"
             />
 
-            <label for="name" class="form-label">Username</label>
+            <label for="name" class="form-label">Tên đăng nhập</label>
             <div class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-file-person"></i>
@@ -271,7 +274,7 @@
               />
             </div>
             <label v-if="role=='ADMIN'" for="phone" class="form-label"
-              >Role</label
+              >Quyền</label
             >
             <div v-if="role=='ADMIN'" class="input-group">
               <span class="input-group-text">
@@ -288,7 +291,7 @@
               </select>
             </div>
 
-            <label v-show="role=='MEMBER'" for="password" class="form-label">Old Password</label>
+            <label v-show="role=='MEMBER'" for="password" class="form-label">Mật khẩu cũ</label>
             <div v-show="role=='MEMBER'" class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-key-fill"></i>
@@ -296,7 +299,7 @@
               <input id="old-pass" type="password" class="form-control" name='old_password'>
             </div>
 
-            <label v-show="role=='MEMBER'" for="password" class="form-label">New Password</label>
+            <label v-show="role=='MEMBER'" for="password" class="form-label">Mật khẩu mới</label>
             <div v-show="role=='MEMBER'" class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-key-fill"></i>
@@ -304,7 +307,7 @@
               <input id="new_pass" type="password" class="form-control" name='password'>
             </div>
 
-            <label v-show="role=='MEMBER'" for="password" class="form-label">Retype Password</label>
+            <label v-show="role=='MEMBER'" for="password" class="form-label">Nhập lại mật khẩu</label>
             <div v-show="role=='MEMBER'" class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-key-fill"></i>

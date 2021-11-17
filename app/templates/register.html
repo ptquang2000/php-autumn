@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <form action="/do-register" class="col-lg-4 col-6" method="POST" @submit="form_validate">
       <!-- Username -->
-      <label for="username" class="form-label">Username</label>
+      <label for="username" class="form-label">Tên đăng nhập</label>
       <div class="input-group">
         <span class="input-group-text">
           <i class="bi bi-file-person"></i>
@@ -10,7 +10,7 @@
         <input type="text" class="form-control" name="username" v-model="username">
       </div>
       <!-- Password -->
-      <label for="password" class="form-label">Password</label>
+      <label for="password" class="form-label">Mật khẩu</label>
       <div class="input-group">
         <span class="input-group-text">
           <i class="bi bi-key-fill"></i>
@@ -18,7 +18,7 @@
         <input type="password" class="form-control" name="password" v-model="password">
       </div>
       <!-- Name -->
-      <label for="phone" class="form-label">Name</label>
+      <label for="phone" class="form-label">Họ và tên</label>
       <div class="input-group">
         <span class="input-group-text">
           <i class="bi bi-card-text"></i>
@@ -26,7 +26,7 @@
         <input type="text" class="form-control" name="name" v-model="name">
       </div>
       <!-- Phone number -->
-      <label for="phone" class="form-label">Phone</label>
+      <label for="phone" class="form-label">Số điện thoại</label>
       <div class="input-group">
         <span class="input-group-text">
           <i class="bi bi-phone"></i>
@@ -42,7 +42,7 @@
         <input type="text" class="form-control" name="email" v-model="email">
       </div>
       <div class="my-2 text-center">
-        <button type="submit" class="btn btn-success text-center">Register</button>
+        <button type="submit" class="btn btn-success text-center">Đăng ký</button>
       </div>
     </form>
   </div>

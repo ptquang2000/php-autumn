@@ -2,17 +2,17 @@
   <div class="container-lg">
     <div class="text-center mb-5">
       <h2 class="display-4">
-        Members List
+        Thành viên
       </h2>
     </div>
     <div class="row justify-content-center text-center mx-5">
-      <div class="col-lg-2 col-md-2 h2 fw-bold">username</div>
-      <div class="col-lg-4 col-md-4 h2 fw-bold">email</div>
-      <div class="col-lg-4 col-md-4 h2 fw-bold">phone</div>
+      <div class="col-lg-3 col-md-3 h2 fw-bold">Tên đăng nhập</div>
+      <div class="col-lg-4 col-md-4 h2 fw-bold">Email</div>
+      <div class="col-lg-4 col-md-4 h2 fw-bold">Số điện thoại</div>
       <div class="col-lg-1 col-md-1 h2 fw-bold"></div>
     </div>
     <div class="row justify-content-center text-center mx-5 my-4 py-4" v-for="member in members">
-      <div class="col-lg-2 col-md-2 lead">
+      <div class="col-lg-3 col-md-3 lead">
         {{member.username}}
       </div>
       <div class="col-lg-4 col-md-4 lead">{{member.email}}</div>

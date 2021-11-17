@@ -22,9 +22,9 @@
         />
       </div>
       <div class="col-md-6 justify-content-center">
-        <label for="name" class="form-label">Name</label>
+        <label for="name" class="form-label">Tên</label>
         <input name="name" class="form-control" v-bind:value="boardgame.name" />
-        <label class="form-label">Age</label>
+        <label class="form-label">Độ tuổi</label>
         <div class="input-group">
           <span class="input-group-text">Max</span>
           <input
@@ -39,7 +39,7 @@
             v-bind:value="boardgame.age_min"
           />
         </div>
-        <label class="form-label">PLayers</label>
+        <label class="form-label">Số người chơi</label>
         <div class="input-group">
           <span class="input-group-text">Max</span>
           <input
@@ -54,7 +54,7 @@
             v-bind:value="boardgame.player_min"
           />
         </div>
-        <label class="form-label">Time</label>
+        <label class="form-label">Thời gian</label>
         <div class="input-group">
           <span class="input-group-text">Max</span>
           <input
@@ -69,7 +69,7 @@
             v-bind:value="boardgame.time_min"
           />
         </div>
-        <label for="" class="form-label">Level</label>
+        <label for="" class="form-label">Độ khó</label>
         <div class="input-group">
           <span class="input-group-text"><i class="bi bi-star-fill"></i></span>
           <select name="level" class="form-select" v-model="boardgame.level">
@@ -78,13 +78,13 @@
             <option value="3">3</option>
           </select>
         </div>
-        <label for="" class="form-label">Price</label>
+        <label for="" class="form-label">Giá tiền</label>
         <input
           class="form-control"
           name="price"
           v-bind:value="boardgame.price"
         />
-        <label for="image-file" class="form-label">File</label>
+        <label for="image-file" class="form-label">Hình ảnh</label>
         <input id="product_detail_input_img" type="file" name="image-file" class="form-control"/>
       </div>
       <div class="mb-2 mt-2 text-center">
@@ -131,21 +131,21 @@
           <div class="display-5 fw-bold">{{boardgame.price}} VND</div>
           <div class="display-5 text-muted" v-if="boardgame.age_max == 0">
             <i class="fas fa-greater-than-equal fa-xs"></i>
-            {{boardgame.age_min}} age
+            {{boardgame.age_min}} tuổi
           </div>
           <div class="display-5 text-muted" v-else>
-            {{boardgame.age_min}}-{{boardgame.age_max}} age
+            {{boardgame.age_min}}-{{boardgame.age_max}} tuổi
           </div>
           <div class="display-5 text-muted">
             <i class="bi bi-person"></i>
-            {{boardgame.player_min}}-{{boardgame.player_max}} players
+            {{boardgame.player_min}}-{{boardgame.player_max}} người chơi
           </div>
           <div class="display-5 text-muted">
             <i class="bi bi-hourglass-bottom"></i>
-            {{boardgame.time_min}}-{{boardgame.time_max}} minutes
+            {{boardgame.time_min}}-{{boardgame.time_max}} phút
           </div>
           <div class="display-5 text-muted">
-            Level:
+            Độ khó
             <i v-for="index in boardgame.level" class="bi bi-star-fill"> </i
             ><i v-for="index in (3-boardgame.level)" class="bi bi-star"></i>
           </div>
@@ -216,7 +216,7 @@
             name="content"
             v-model="content"
           />
-          <button type="submit" class="btn btn-secondary">Comment</button>
+          <button type="submit" class="btn btn-secondary">Bình luận</button>
         </div>
       </div>
     </form>
@@ -236,7 +236,7 @@
             v-model="content"
           />
           <button type="submit" class="btn btn-secondary disabled">
-            Comment
+            Đăng
           </button>
         </div>
       </div>

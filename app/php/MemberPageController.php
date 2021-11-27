@@ -25,8 +25,10 @@ class MemberPageController
     $url = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
     $user = form_model('User');
 
-    if ($_SESSION['USER']->get_authority() == 'ADMIN')
+    if ($_SESSION['USER']->get_authority() == 'ADMIN'){
       $this->userdetails_service->save_user($user);
+      return 'Location: '.$url.'?error=Thay đổi quyền thành công!!';
+    }
     if ($_SESSION['USER']->get_authority() == 'MEMBER'){
       if (! password_verify(htmlspecialchars_decode($_POST['old_password']), $_SESSION['USER']->get_password())){
         return 'Location: '.$url.'?error=Wrong old password';
@@ -47,10 +49,11 @@ class MemberPageController
           return 'Location: '.$url.'?error=Username has already been used';
         throw $e;
       }
+      return 'Location: '.$url.'?error=Đổi mật khẩu thành công!!';
     }
     
 
-    return 'Location: '.$url.'?error=Password changed successfully!!';
+    
   }
 
   #[RequestMapping(value: '/save-info', method: RequestMethod::POST)]

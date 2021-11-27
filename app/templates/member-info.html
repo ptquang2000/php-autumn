@@ -16,7 +16,7 @@
         role="tab"
         aria-controls="v-pills-profile"
         aria-selected="true"
-        style="width: 8rem;"
+        style="width: 8rem"
       >
         Hồ sơ
       </button>
@@ -29,7 +29,7 @@
         role="tab"
         aria-controls="v-pills-account"
         aria-selected="false"
-        style="width: 8rem;"
+        style="width: 8rem"
       >
         Tài khoản
       </button>
@@ -42,7 +42,7 @@
         role="tab"
         aria-controls="v-pills-fav"
         aria-selected="false"
-        style="width: 8rem;"
+        style="width: 8rem"
       >
         Yêu thích
       </button>
@@ -270,6 +270,7 @@
                 type="text"
                 class="form-control"
                 name="username"
+                readonly
                 v-bind:value="member.user.username"
               />
             </div>
@@ -291,28 +292,49 @@
               </select>
             </div>
 
-            <label v-show="role=='MEMBER'" for="password" class="form-label">Mật khẩu cũ</label>
+            <label v-show="role=='MEMBER'" for="password" class="form-label"
+              >Mật khẩu cũ</label
+            >
             <div v-show="role=='MEMBER'" class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-key-fill"></i>
               </span>
-              <input id="old-pass" type="password" class="form-control" name='old_password'>
+              <input
+                id="old-pass"
+                type="password"
+                class="form-control"
+                name="old_password"
+              />
             </div>
 
-            <label v-show="role=='MEMBER'" for="password" class="form-label">Mật khẩu mới</label>
+            <label v-show="role=='MEMBER'" for="password" class="form-label"
+              >Mật khẩu mới</label
+            >
             <div v-show="role=='MEMBER'" class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-key-fill"></i>
               </span>
-              <input id="new_pass" type="password" class="form-control" name='password'>
+              <input
+                id="new_pass"
+                type="password"
+                class="form-control"
+                name="password"
+              />
             </div>
 
-            <label v-show="role=='MEMBER'" for="password" class="form-label">Nhập lại mật khẩu</label>
+            <label v-show="role=='MEMBER'" for="password" class="form-label"
+              >Nhập lại mật khẩu</label
+            >
             <div v-show="role=='MEMBER'" class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-key-fill"></i>
               </span>
-              <input id="retype_pass" type="password" class="form-control" name='retype_password'>
+              <input
+                id="retype_pass"
+                type="password"
+                class="form-control"
+                name="retype_password"
+              />
             </div>
             <div class="text-center m-3">
               <button

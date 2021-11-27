@@ -3,28 +3,28 @@
   <div class="container-lg" @drop="drop_img($event)" @dragenter.prevent @dragover.prevent>
     <form method="POST" @submit.prevent="save_boardgame" enctype="multipart/form-data" class="form-inline row justify-content-center align-items-center">
       <div class="col-md-6 justify-content-center">
-        <label for="name" class="form-label">Tên</label>
-        <input name="name" class="form-control" v-model="name"/>
+        <label  for="name" class="form-label">Tên</label>
+        <input maxlength="50" required name="name" class="form-control" v-model="name"/>
         <label class="form-label">Độ tuổi</label>
         <div class="input-group">
           <span class="input-group-text">Max</span>
-          <input class="form-control" name="age_max" v-model="age_max"/>
+          <input type="number" class="form-control" name="age_max" v-model="age_max"/>
           <span class="input-group-text">Min</span>
-          <input class="form-control" name="age_min" v-model="age_min"/>
+          <input type="number" class="form-control" name="age_min" v-model="age_min"/>
         </div>
         <label class="form-label">Số người chơi</label>
         <div class="input-group">
           <span class="input-group-text">Max</span>
-          <input class="form-control" name="player_max" v-model="player_max"/>
+          <input required type="number" class="form-control" name="player_max" v-model="player_max"/>
           <span class="input-group-text">Min</span>
-          <input class="form-control" name="player_min" v-model="player_min"/>
+          <input required type="number" class="form-control" name="player_min" v-model="player_min"/>
         </div>
         <label class="form-label">Thời gian</label>
         <div class="input-group">
           <span class="input-group-text">Max</span>
-          <input class="form-control" name="time_max" v-model="time_max"/>
+          <input required type="number" class="form-control" name="time_max" v-model="time_max"/>
           <span class="input-group-text">Min</span>
-          <input class="form-control" name="time_min" v-model="time_min"/>
+          <input required type="number" class="form-control" name="time_min" v-model="time_min"/>
         </div>
         <label for="" class="form-label">Độ khó</label>
         <select name="level" class="form-select" v-model="level">
@@ -33,9 +33,9 @@
           <option value="3">3</option>
         </select>
         <label for="" class="form-label">Giá tiền</label>
-        <input class="form-control" name="price" v-model="price"/>
+        <input type="number" class="form-control" name="price" v-model="price"/>
         <label for="image-file" class="form-label">Hình ảnh</label>
-        <input id="product_img" type="file" name="image-file" class="form-control" ref="image"/>
+        <input required id="product_img" type="file" name="image-file" class="form-control" ref="image"/>
       </div>
       <div class="mb-2 mt-2 text-center">
         <button type="submit" class="btn btn-success">

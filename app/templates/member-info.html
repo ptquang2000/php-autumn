@@ -159,6 +159,7 @@
             <label for="name" class="form-label">Tên</label>
             <div class="input-group">
               <input
+                required
                 type="text"
                 class="form-control"
                 name="name"
@@ -171,7 +172,8 @@
             <label for="email" class="form-label">Email</label>
             <div class="input-group">
               <input
-                type="text"
+                required
+                type="email"
                 class="form-control"
                 name="email"
                 v-bind:value="member.email"
@@ -183,7 +185,8 @@
             <label for="phone" class="form-label">Số điện thoại</label>
             <div class="input-group">
               <input
-                type="text"
+                required
+                type="number"
                 class="form-control"
                 name="phone"
                 v-bind:value="member.phone"
@@ -195,6 +198,7 @@
             <label for="address" class="form-label">Địa chỉ</label>
             <div class="input-group">
               <input
+                required
                 type="text"
                 class="form-control"
                 name="address"
@@ -207,6 +211,7 @@
             <label for="birth" class="form-label">Ngày sinh</label>
             <div class="input-group" id="calendar-icon">
               <input
+                required
                 type="date"
                 class="form-control"
                 name="birth"
@@ -267,6 +272,7 @@
                 <i class="bi bi-file-person"></i>
               </span>
               <input
+                required
                 type="text"
                 class="form-control"
                 name="username"
@@ -300,6 +306,7 @@
                 <i class="bi bi-key-fill"></i>
               </span>
               <input
+                required
                 id="old-pass"
                 type="password"
                 class="form-control"
@@ -315,6 +322,7 @@
                 <i class="bi bi-key-fill"></i>
               </span>
               <input
+                required
                 id="new_pass"
                 type="password"
                 class="form-control"
@@ -330,6 +338,7 @@
                 <i class="bi bi-key-fill"></i>
               </span>
               <input
+                required
                 id="retype_pass"
                 type="password"
                 class="form-control"
@@ -345,7 +354,7 @@
                 <i class="bi bi-pencil"></i>
               </button>
             </div>
-            <div v-if="error" class="row justify-content-center my-0">
+            <div v-if="error"   class="row justify-content-center my-0">
               <div class="col card border-0" style="max-width: 18rem">
                 <div class="card-body">
                   <p class="card-text text-center">{{error}}</p>

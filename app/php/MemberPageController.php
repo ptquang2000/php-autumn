@@ -31,11 +31,11 @@ class MemberPageController
     }
     if ($_SESSION['USER']->get_authority() == 'MEMBER'){
       if (! password_verify(htmlspecialchars_decode($_POST['old_password']), $_SESSION['USER']->get_password())){
-        return 'Location: '.$url.'?error=Wrong old password';
+        return 'Location: '.$url.'?error=Nhập sai mật khẩu';
       }
 
       if (htmlspecialchars_decode($_POST['password']) != htmlspecialchars_decode($_POST['retype_password'])){
-        return 'Location: '.$url.'?error=Password mismatched';
+        return 'Location: '.$url.'?error=Mật khẩu không trùng khớp';
       }
 
       try{
@@ -46,7 +46,7 @@ class MemberPageController
       }catch (\mysqli_sql_exception $e)
       {
         if (preg_match('/^Duplicate entry \'.*\' for key \'username\'$/', $e->getMessage()) == 1)
-          return 'Location: '.$url.'?error=Username has already been used';
+          return 'Location: '.$url.'?error=Tên đăng nhập đã được sử dụng';
         throw $e;
       }
       return 'Location: '.$url.'?error=Đổi mật khẩu thành công!!';

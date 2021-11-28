@@ -322,7 +322,6 @@
                 <i class="bi bi-key-fill"></i>
               </span>
               <input
-                required
                 id="new_pass"
                 type="password"
                 class="form-control"
@@ -338,7 +337,6 @@
                 <i class="bi bi-key-fill"></i>
               </span>
               <input
-                required
                 id="retype_pass"
                 type="password"
                 class="form-control"
@@ -354,7 +352,7 @@
                 <i class="bi bi-pencil"></i>
               </button>
             </div>
-            <div v-if="error"   class="row justify-content-center my-0">
+            <div v-if="error" class="row justify-content-center my-0">
               <div class="col card border-0" style="max-width: 18rem">
                 <div class="card-body">
                   <p class="card-text text-center">{{error}}</p>

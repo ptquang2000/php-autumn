@@ -112,14 +112,12 @@
             bg-light
             gy-3
           "
+          @drop="drop_img($event)"
+          @dragenter.prevent
+          @dragover.prevent
+          id="drop_img"
         >
-          <div
-            @drop="drop_img($event)"
-            @dragenter.prevent
-            @dragover.prevent
-            class="col-lg-3 col-md-6 col-sm-6 file-upload-wrapper"
-            id="drop_img"
-          >
+          <div class="col-lg-3 col-md-6 col-sm-6 file-upload-wrapper">
             <img
               v-bind:src="'data:image/png;base64,'+image"
               alt="avatar"

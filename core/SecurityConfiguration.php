@@ -112,7 +112,7 @@ class SecurityConfiguration
         !isset($_SESSION['USER'])
         && $path == $GLOBALS['config']['security.login'] ?? '/login'
       )
-        $_SESSION['CURRENT_URL'] = $_SESSION['CURRENT_URL'] ?? $_SERVER['HTTP_REFERER'] ?? $_SERVER['REQUEST_URI'];
+        $_SESSION['CURRENT_URL'] = $_SERVER['HTTP_REFERER'] ?? $_SERVER['REQUEST_URI'];
       return true;
     }
     if (isset($_SESSION['USER'])) {

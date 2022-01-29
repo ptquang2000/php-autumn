@@ -20,8 +20,8 @@ class RequestMethod
 #[Attribute]
 class RequestMapping 
 {
-  public function __construct(public $value, public $method)  {}
-  public function path_variable()  
+  public function __construct(public $value, public $method='GET')  {}
+  public function path_variable()
   { 
     if (preg_match('/^\/([^\/]+(\/[^\/]+)*)*$/', $this->value) == 1)
     {

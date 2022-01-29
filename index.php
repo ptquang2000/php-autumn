@@ -9,7 +9,7 @@ spl_autoload_register(function ($class) {
     return strtolower($item);
   }, $parts));
   $path = __DIR__ . DL . $parts . DL . $file . '.php';
-  if (file_exists($path))
+  if ( file_exists($path) )
     include_once $path;
 });
 session_start();
@@ -27,8 +27,8 @@ use Core\Router;
 
 // setup
 $df_app = glob("app/php/*.php");
-foreach ($df_app as $filename)
+foreach ( $df_app as $filename )
   Router::setup($filename);
 
-if (Router::$paths) Router::route($url);
+if ( Router::$paths) Router::route($url );
 else echo "No configuration files found";

@@ -3,7 +3,11 @@
 namespace Core;
 
 # directory
-define("DL", "\\");
+if (PHP_OS_FAMILY === "Windows") {
+  define("DL", "\\");
+} elseif (PHP_OS_FAMILY === "Linux") {
+  define("DL", "/");
+}
 define('__STATIC__', 'app'.DL.'static'.DL);
 define('__TEMPLATE__', 'app'.DL.'templates'.DL);
 define('__IMAGE__', __TEMPLATE__.'img'.DL);

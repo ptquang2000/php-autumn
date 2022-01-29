@@ -1,7 +1,7 @@
 <?php
-include_once 'core\\Attributes.php';
-include_once 'core\\Functions.php';
-include_once 'core\\Define.php';
+include_once 'core/Attributes.php';
+include_once 'core/Functions.php';
+include_once 'core/Define.php';
 spl_autoload_register(function ($class) {
   $parts = explode(DL, $class);
   $file = array_pop($parts);
@@ -29,4 +29,6 @@ use Core\Router;
 $df_app = glob("app/php/*.php");
 foreach ($df_app as $filename)
   Router::setup($filename);
-Router::route($url);
+
+if (Router::$paths) Router::route($url);
+else echo "No configuration files found";

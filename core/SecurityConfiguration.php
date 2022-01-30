@@ -23,8 +23,9 @@ class SecurityConfiguration
 
   public function httpConfigure(HttpSecurity $http)
   {
-    foreach (Router::$paths as $path => $prop)
-      $http->authorizeRequest()->antMatchers($prop['method'], $path);
+    foreach (Router::$paths as $path => $methods)
+      foreach ($methods as $method => $prop)
+        $http->authorizeRequest()->antMatchers($method, $path);
   }
 
   public function set_userdetails_service($userdetails_service)
@@ -92,7 +93,7 @@ class SecurityConfiguration
     $result = array_filter(
       $this->http_security->antMatchers->property,
       function ($property) use ($path) {
-        return $property['path'] == $path;
+        return $property['path'] == $path && $property['method'] == Router::$request_method;
       }
     );
     return $result[array_key_first($result)]['role'];

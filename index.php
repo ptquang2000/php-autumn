@@ -30,5 +30,5 @@ $df_app = glob("app/php/*.php");
 foreach ( $df_app as $filename )
   Router::setup($filename);
 
-if ( Router::$paths) Router::route($url );
+if ( Router::$paths) Router::route($url);
 else echo "No configuration files found";

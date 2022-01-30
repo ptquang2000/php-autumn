@@ -10,10 +10,7 @@ class Employee {
     private $eid;
     #[Column(name: 'name')]
     private $name;
-
-    #[OneToMany(map_by:'Customer')]
-    private $customers;
-
+    
     public static function newEmployee($name) {
         $employee = new Employee();
         $employee->set_name($name);
@@ -31,15 +28,6 @@ class Employee {
     }
     public function get_name() {
         return $this->name;
-    }
-    public function set_customers($customers) {
-        $this->customers = $customers;
-    }
-    public function get_customers() {
-        return $this->customers;
-    }
-    public function to_string() {
-        return "Employee [id: ".$this->eid.", name: ".$this->name."]";
     }
 
 }

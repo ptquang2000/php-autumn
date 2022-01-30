@@ -18,7 +18,7 @@ class WebController {
     #[RequestMapping(value: '/url/$number')]
     function get_dynamic_url($number, Model $model)
     {
-        if (is_numeric($number)) die("invalid number");
+        if (!is_numeric($number)) die("invalid number");
         $model->add_attribute("isEven", $number % 2 == 0);
         return 'dynamic.php';
     }

@@ -52,7 +52,7 @@ class OneToMany
 {
   const SETNULL = 0;
   const DELETE = 1;
-  public function __construct(public $map_by, public $cascade)  {}
+  public function __construct(public $map_by, public $cascade=0)  {}
 }
 #[Attribute(Attribute::TARGET_ALL)]
 class Entity

@@ -11,6 +11,7 @@ class Router
 {
 	public static $url;
 	public static $path;
+	public static $request_method;
 	public static $paths = array();
 	public static $type;
 	private static $controller;
@@ -97,18 +98,22 @@ class Router
 					'" in method "'.$method->getName().
 					'" defines params error');
 
-			// check if path has been defined 		
-			if (array_key_exists($attr_args['value'], Router::$paths))
+			// check if path has been defined
+			$request_method = $method->getAttributes()[0]->newInstance()->method;
+			if (
+				array_key_exists($attr_args['value'], Router::$paths)
+			&& 
+				isset(Router::$paths[$request_method])
+			)
 				throw new Exception(
 					'Path "'.$attr_args['value'].
 					'" has already defined in class "'.
-					Router::$paths[$attr_args['value']]['class'].
+					Router::$paths[$request_method][$attr_args['value']]['class'].
 					'"\'s method "'.
-					Router::$paths[$attr_args['value']]['class_method'].
+					Router::$paths[$request_method][$attr_args['value']]['class_method'].
 					'"');
 			
-			Router::$paths[$attr_args['value']] = [
-				'method'=> $attr_args['method'] ?? RequestMethod::GET,
+			Router::$paths[$attr_args['value']][$request_method] = [
 				'class' => $class,
 				'class_method' => $method->getName(),
 				'type' => $attributes[0]->getName().'Trait',
@@ -116,9 +121,9 @@ class Router
 				'model' => array_key_first($path_model)
 			];
 			if ($path_object)
-				Router::$paths[$attr_args['value']]['object'] = [
-						'idx' => array_key_first($path_object),
-						'type' => $path_object[array_key_first($path_object)]->getType()->getName()
+				Router::$paths[$attr_args['value']][$request_method]['object'] = [
+					'idx' => array_key_first($path_object),
+					'type' => $path_object[array_key_first($path_object)]->getType()->getName()
 				];
 		}	
 	}
@@ -132,7 +137,7 @@ class Router
 		
 		// if the number of params matches
 		$df_parts = array_diff_assoc($url_parts, $path_parts);
-		$path_params = Router::$paths[$path]['params'];
+		$path_params = Router::$paths[$path][Router::$request_method]['params'];
 		if (count($df_parts) != count($path_params))  return null;
 
 		return $df_parts;
@@ -141,14 +146,15 @@ class Router
 	public static function route($url)
 	{
 		Router::$url = $url;
+		Router::$request_method = $_SERVER['REQUEST_METHOD'];
 
 		// security filter
 		if (isset(router::$security) && 
-		$_SERVER['REQUEST_METHOD'] === RequestMethod::POST &&
+		Router::$request_method === RequestMethod::POST &&
 		$url == ($GLOBALS['config']['security.login_processing'] ?? '/login'))
 			Router::$security->authenticate();
 		if (isset(router::$security) && 
-		$_SERVER['REQUEST_METHOD'] === RequestMethod::GET &&
+		Router::$request_method === RequestMethod::GET &&
 		$url == ($GLOBALS['config']['security.logout_processing'] ?? '/logout'))
 			Router::$security->logout();
 
@@ -161,12 +167,12 @@ class Router
 		}
 		if (array_key_exists(Router::$url, Router::$paths))
 		{
-			if ($_SERVER['REQUEST_METHOD'] !== Router::$paths[$url]['method'])
+			if ( !array_key_exists(Router::$request_method, Router::$paths[$url]) )
 				throw new HttpException('404');
 
 			Router::$path = $url;
-			$class = Router::$paths[$url]['class'];
-			Router::$type = $type = Router::$paths[$url]['type'];
+			$class = Router::$paths[$url][Router::$request_method]['class'];
+			Router::$type = $type = Router::$paths[$url][Router::$request_method]['type'];
 			// instantiate controller
 			$code = <<< EOF
 			\$controller = new class extends $class
@@ -175,19 +181,22 @@ class Router
 			eval($code);
 			Router::$controller = $controller;
 		}
-		else foreach (Router::$paths as $path => $props)
+		else foreach (Router::$paths as $path => $request_methods)
 		{
 			Router::$df_parts = Router::get_path_params($path);
-			if (!$props['params'] || !Router::$df_parts
-			|| $_SERVER['REQUEST_METHOD'] !== Router::$paths[$path]['method']) 
+			if (
+				!array_key_exists(Router::$request_method, $request_methods)
+				||
+				!$request_methods[Router::$request_method]['params'] || !Router::$df_parts
+			) 
 			{
 				if ($path === array_key_last(Router::$paths))
 					throw new HttpException('404');
 				continue;
 			}
 			Router::$path = $path;
-			$class = Router::$paths[$path]['class'];
-			Router::$type = $type = Router::$paths[$path]['type'];
+			$class = Router::$paths[$path][Router::$request_method]['class'];
+			Router::$type = $type = Router::$paths[$path][Router::$request_method]['type'];
 			// instantiate controller
 			$code = <<< EOF
 			\$controller = new class extends $class
@@ -199,26 +208,26 @@ class Router
 		}
 
 		// set model for method
-		if (isset(Router::$paths[Router::$path]['model']))
+		if (isset(Router::$paths[Router::$path][Router::$request_method]['model']))
 			array_splice(Router::$df_parts, 
-				Router::$paths[Router::$path]['model'], 0, 
+				Router::$paths[Router::$path][Router::$request_method]['model'], 0, 
 				[$controller->get_model()]);
 		// set model for method
-		if (array_key_exists('object', Router::$paths[Router::$path]))
+		if (array_key_exists('object', Router::$paths[Router::$path][Router::$request_method]))
 		{
-			$reflection = new \ReflectionClass(Router::$paths[Router::$path]['object']['type']);	
-			$object = new Router::$paths[Router::$path]['object']['type']();
+			$reflection = new \ReflectionClass(Router::$paths[Router::$path][Router::$request_method]['object']['type']);	
+			$object = new Router::$paths[Router::$path][Router::$request_method]['object']['type']();
 			$body = json_decode(file_get_contents('php://input'));
 			foreach($reflection->getProperties() as $prop)
 				$object->{'set_'.$prop->getName()}(htmlspecialchars($body->{$prop->getName()} ?? null));
 			array_splice(Router::$df_parts, 
-				Router::$paths[Router::$path]['object']['idx'], 0, 
+				Router::$paths[Router::$path][Router::$request_method]['object']['idx'], 0, 
 				[$object]);
 		}
 		// call url handle
 		if (isset(Router::$security) && Router::$security->is_enable()) Router::$security->authorize(Router::$path);
 
-		$result = Router::$controller->{Router::$paths[Router::$path]['class_method']}
+		$result = Router::$controller->{Router::$paths[Router::$path][Router::$request_method]['class_method']}
 			(...Router::$df_parts);
 		if (Router::$type == 'Core\RestControllerTrait')
 			echo RestControllerTrait::encode($result);

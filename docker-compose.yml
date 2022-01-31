@@ -19,3 +19,5 @@ services:
     container_name: phpserver
     volumes:
     - ./src:/var/www/html
+    ports:
+    - "127.24.0.4:80:80"

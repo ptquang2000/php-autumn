@@ -1,0 +1,21 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+  db:
+    image: mysql:8
+    container_name: mydb
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+    - ./demo.sql:/docker-entrypoint-initdb.d/demo.sql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: demo
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+  php:
+    build: .
+    container_name: phpserver
+    volumes:
+    - ./src:/var/www/html

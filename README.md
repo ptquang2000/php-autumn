@@ -129,3 +129,5 @@ Visiting the first link `http://127.24.0.4/your-path/1`, where you should see "1
 Then visiting `http://127.24.0.4/your-path/2`. Notice how the message changes from “1 is an odd number” to “2 is an even number”:
 
 The `$number` parameter can be explicitly overridden through the path string. 
+
+![image][../assets/web-controller.gif]

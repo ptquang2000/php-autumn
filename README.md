@@ -130,4 +130,4 @@ Then visiting `http://127.24.0.4/your-path/2`. Notice how the message changes fr
 
 The `$number` parameter can be explicitly overridden through the path string. 
 
-![image][../assets/web-controller.gif]
+![image](../assets/web-controller.gif)

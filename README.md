@@ -197,4 +197,4 @@ Run these command to start the application
 ```bash
 docker-compose up --build
 ```
-You can view the result at `http:/127.24.0.4`
+You can view the result at `http://127.24.0.4`

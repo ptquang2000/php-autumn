@@ -100,27 +100,24 @@ docker-compose up --build
 ```
 When the app starts, we can immediately interrogate it.
 ```bash
-curl -v 127.24.0.4/employees
+curl -X GET 127.24.0.4/employees | json_pp
 ```
 This will yield:
-Here you can see the pre-loaded data, in a compacted format.
 
 To create a new Employee record we use the following command in a terminal:
 ```bash
-curl -X POST 127.24.0.4/employees -H 'Content-type:application/json' -d '{"name":"Jayce"}'
+curl -X POST 127.24.0.4/employees -H 'Content-type:application/json' -d '{"name":"Jayce"}' | json_pp
 ```
 Then it stores newly created employee and sends it back to us:
+
+You can update the employee. Let’s change his name.
 ```bash
-{"id":4,"name":"Jayce"}
-```
-```bash
-curl -X PUT 127.24.0.4/employees/4 -H 'Content-type:application/json' -d '{"name": "Zed"}'
+curl -X PUT 127.24.0.4/employees/4 -H 'Content-type:application/json' -d '{"name": "Zed"}' | json_pp
 ```
 And we can see the change reflected in the output.
-```bash
-{"id":4,"name":"Zed"}
-```
+
+
 Finally, you can delete users like this:
 ```bash
-curl -X DELETE 127.24.0.4/employees/4
+curl -X DELETE 127.24.0.4/employees/4 | json_pp
 ```

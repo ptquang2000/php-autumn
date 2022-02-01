@@ -6,27 +6,35 @@
 The following listing shows the Customer class (in  `/app/php/Customer.php`):
 ```php
 <?php
-namespace App\PHP;
-use Core\{Table, ID, Column, OneToMany};
-#[Table(name: 'employee')]
-class Employee {
 
-    #[ID(name: 'eid')]
-    private $eid;
+namespace App\PHP;
+use Core\{Table, ID, Column, ManyToOne};
+
+#[Table(name: 'customer')]
+class Customer {
+
+    #[ID(name: 'cid')]
+    private $cid;
     #[Column(name: 'name')]
     private $name;
-    #[OneToMany(map_by:'Customer')]
-    private $customers;
-    public static function newEmployee($name) {
-        $employee = new Employee();
-        $employee->set_name($name);
-        return $employee;
+    #[Column(name: 'eid')]
+    private $eid;
+
+    #[ManyToOne(name: 'eid', map_by:'Employee')]
+    private $employee;
+
+    public static function newCustomer($name, $eid) {
+        $customer = new Customer();
+        $customer->set_name($name);
+        $customer->set_eid($eid);
+        return $customer;
     }
-    public function set_eid($eid) {
-        $this->eid = $eid;
+
+    public function set_cid($cid) {
+        $this->cid = $cid;
     }
-    public function get_eid() {
-        return $this->eid;
+    public function get_cid() {
+        return $this->cid;
     }
     public function set_name($name) {
         $this->name = $name;
@@ -34,16 +42,24 @@ class Employee {
     public function get_name() {
         return $this->name;
     }
-    public function set_customers($customers) {
-        $this->customers = $customers;
+    public function set_eid($eid) {
+        $this->eid = $eid;
     }
-    public function get_customers() {
-        return $this->customers;
+    public function get_eid() {
+        return $this->eid;
+    }
+    public function set_employee($employee) {
+        $this->employee = $employee;
+    }
+    public function get_employee() {
+        return $this->employee;
     }
     public function to_string() {
-        return "Employee [id: ".$this->eid.", name: ".$this->name."]";
+        return "Customer [id: ".$this->cid.", name: ".$this->name."]";
     }
+
 }
+
 ?>
 ```
 Here you have a Customer class with three attributes: `$id, $name, and $employee`. 
@@ -52,7 +68,7 @@ The other constructor is the one you use to create instances of Customer to be s
 
 The `Customer` class is annotated with `#[Table(name: 'customer')]`, indicating that it is an entity, which is mapped to a table named customer.
 
-The `Customer` object’s `$eid` property is annotated with `#[ID(name: 'eid')]` so that PHP-autumn recognizes it as the object’s ID. 
+The `Customer` object’s `$eid` property is annotated with `#[ID(name: 'cid')]` so that PHP-autumn recognizes it as the object’s ID. 
 The `$eid` property is also annotated to indicate that the ID should be generated automatically.
 
 The other property, name is annotated with `#[Column(name: 'name')]`. 
@@ -64,7 +80,7 @@ The convenient `to_string()` method print outs the customer’s properties.
 PHP-autumn focuses storing data in a relational database. 
 Its most compelling feature is the ability to create repository implementations automatically, at runtime, from a repository interface.
 
-To see how this works, create a repository interface that works with `Customer` entities as the following listing (in `app/php/EmployeeRepositor.php`) shows:
+To see how this works, create a repository interface that works with `Customer` entities as the following listing (in `app/php/Customerepositor.php`) shows:
 ```php
 <?php
 namespace App\PHP;
@@ -113,7 +129,7 @@ These relationship properties are not required when creating entity class.
 
 ### Create Apllication Class
 The following listing shows the class that Initializr created for this example (in `app/php/Demo.php`):
-```
+```php
 <?php
 
 namespace App\PHP;

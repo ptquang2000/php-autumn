@@ -7,8 +7,12 @@
     <title>Dynamic URL</title>
 </head>
 <body>
-
-    <p>The number is <?php if (!$isEven) echo "not"?> an even number</p>
-    
+    <?php if (!$isEven):?>
+        <p><?=$number?> is an even number</p>
+    <?php else:?>
+        <p><?=$number?> is an odd number</p>
+    <?php endif?>
+    <br>
+    <a href="/your-path">go back</a>
 </body>
 </html>

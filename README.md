@@ -182,9 +182,13 @@ class Demo {
 ?>
 ```
 This class has two pproperties `$customer_repository` and `$employee_repository` annotated with `#[Autowired]` which is marked in order to help php-autumn initialize that properties automatically
+
 These two repository saves a handful of `Customer` objects and `Employee` objects, demonstrating the `save()` method and setting up some data to work with. 
+
 Next, it calls `find_all()` to fetch all `Employee` objects from the database. For each employee object, a array of customers is also assigned to `$customers` property by php-autumn.
+
 Then it calls `find_by_id()` to fetch a single `Employee` by its ID. 
+
 Finally, it calls `find_by_name()` to find all customers whose name is "Bela". These customers also has property `$employee` assigned by php-autumn.
 The result is `echo` to the screen.
 

@@ -104,11 +104,16 @@ curl -X GET 127.24.0.4/employees | json_pp
 ```
 This will yield:
 
+![image](../assets/GET.png)
+
 To create a new Employee record we use the following command in a terminal:
 ```bash
 curl -X POST 127.24.0.4/employees -H 'Content-type:application/json' -d '{"name":"Jayce"}' | json_pp
 ```
 Then it stores newly created employee and sends it back to us:
+
+![image](../assets/POST.png)
+
 
 You can update the employee. Let’s change his name.
 ```bash
@@ -116,6 +121,7 @@ curl -X PUT 127.24.0.4/employees/4 -H 'Content-type:application/json' -d '{"name
 ```
 And we can see the change reflected in the output.
 
+![image](../assets/PUT.png)
 
 Finally, you can delete users like this:
 ```bash

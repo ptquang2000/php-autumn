@@ -9,5 +9,5 @@ This framework covers some basic web application features which I have used in m
 * Accessing MySQL Database ([guide](https://github.com/ptquang2000/php-autumn/tree/db-connection))
 * Building Rest Services ([guide](https://github.com/ptquang2000/php-autumn/tree/rest-service))
 
-> Exclamation</br>
+> Disclaimer</br>
 > These guide is taken from Spring Boot Guide with php tranformation.
